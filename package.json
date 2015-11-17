@@ -1,0 +1,14 @@
+{
+  "name": "project",
+  "version": "0.0.1",
+  "description": "Logic Gate sim server",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "logic"
+  ],
+  "author": "Mark Cockburn",
+  "license": "BSD-2-Clause"
+}
