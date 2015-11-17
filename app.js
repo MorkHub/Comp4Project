@@ -5,7 +5,7 @@ var ejs = require("ejs");
 var port = 8080 || process.env.port;
 
 //app.use(express.static(__dirname + "/public"));
-
+console.log("hi")
 // set the view engine to ejs
 app.set('view engine', 'ejs');
 
