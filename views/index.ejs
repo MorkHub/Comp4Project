@@ -11,6 +11,7 @@
 
     <main>
         <div class="row">
+          <% include partials/error %>
           <% if ( !valid ) { %>
             <div class="col-sm-8">
               <div class="jumbotron">
@@ -27,6 +28,8 @@
             </div>
             <% if ( !valid ) { %>
               <% include partials/login %>
+            <% } else { %>
+              <% include partials/tasks %>
             <% } %>
         </div>
     </main>

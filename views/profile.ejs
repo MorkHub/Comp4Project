@@ -11,6 +11,7 @@
 
     <main>
         <div class="row">
+          <% include partials/error %>
           <% if ( !valid ) { %>
             <div class="col-sm-12">
               <div class="alert alert-success" role="alert"><strong>Not signed ion!</strong> please sign in!</div>

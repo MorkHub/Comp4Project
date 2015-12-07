@@ -12,6 +12,7 @@
 
     <main>
         <div class="row">
+          <% include partials/error %>
           <% if ( !valid ) { %>
             <div class="col-sm-12">
               <div class="alert alert-success" role="alert"><strong>Not signed ion!</strong> please sign in!</div>
@@ -35,13 +36,15 @@
                       <td>Password</td>
                       <td>Access Level</td>
                     </tr>
-                    <% users.forEach ( function ( user ) { %>
+                    <% users.forEach ( function ( u ) { %>
+                      <% if ( user.access >= 5 || user.school == u.school ) { %>
                       <tr>
-                        <td><%= user.name %></td>
-                        <td><%= user.email %></td>
-                        <td><%= user.password %></td>
-                        <td><%= user.access %></td>
+                        <td><%= u.name %></td>
+                        <td><%= u.email %></td>
+                        <td><%= u.password %></td>
+                        <td><%= u.access %></td>
                       </tr>
+                      <% } %>
                     <% }) %>
                   </table>
                 </div>

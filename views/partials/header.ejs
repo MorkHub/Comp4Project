@@ -12,7 +12,7 @@
             <li><a href="/">Home</a></li>
             <% if ( valid ) {%>
               <li><a href="/profile">Profile</a></li>
-              <% if ( user.access > 1 ) { %><li><a href="/admin">Admin</a></li><% } %>
+              <% if ( user.access >= 3 ) { %><li><a href="/admin">Admin</a></li><% } %>
               <li class="right"><a href="/logout">Logout</a></li>
             <% } %>
 
