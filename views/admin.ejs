@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <title>Admin panel</title>
+  <% include partials/head %>
+</head>
+<body class="container">
+
+    <header>
+        <% include partials/header %>
+    </header>
+
+    <main>
+        <div class="row">
+          <% if ( !valid ) { %>
+            <div class="col-sm-12">
+              <div class="alert alert-success" role="alert"><strong>Not signed ion!</strong> please sign in!</div>
+            </div>
+            <% include partials/login %>
+          <% } else { %>
+            <div class="col-sm-12">
+          <% } %>
+                <div class="jumbotron">
+                    <h1>Admin Panel</h1>
+                    <p>Welcome to the admin panel, <%= user.name %></p>
+                </div>
+                <div class="panel panel-default">
+                  <div class="panel-heading">
+                    <h3 class="panel-title">Users</h3>
+                  </div>
+                  <table class="table">
+                    <tr>
+                      <td>Name</td>
+                      <td>Email</td>
+                      <td>Password</td>
+                      <td>Access Level</td>
+                    </tr>
+                    <% users.forEach ( function ( user ) { %>
+                      <tr>
+                        <td><%= user.name %></td>
+                        <td><%= user.email %></td>
+                        <td><%= user.password %></td>
+                        <td><%= user.access %></td>
+                      </tr>
+                    <% }) %>
+                  </table>
+                </div>
+            </div>
+          </div>
+        </div>
+    </main>
+
+    <footer>
+        <% include partials/footer %>
+    </footer>
+
+</body>
+</html>
