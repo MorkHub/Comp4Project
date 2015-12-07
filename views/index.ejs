@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-    <% include partials/head  %>
+    <% include partials/head %>
 </head>
 <body class="container">
 
@@ -10,15 +10,30 @@
     </header>
 
     <main>
-        <div class="jumbotron">
-            <h1>This is great</h1>
-            <p>Welcome to templating using EJS</p>
+        <div class="row">
+          <% if ( !valid ) { %>
+            <div class="col-sm-8">
+              <div class="jumbotron">
+                  <h1>You are not signed in</h1>
+                  <p>Please use the form to the right to sign in to access this service.</p>
+              </div>
+          <% } else { %>
+            <div class="col-sm-12">
+              <div class="jumbotron">
+                  <h1>Signed in! :-)</h1>
+                  <p>Thanks for signing in, please enjoy, <%= user.name %></p>
+              </div>
+          <% } %>
+            </div>
+            <% if ( !valid ) { %>
+              <% include partials/login %>
+            <% } %>
         </div>
     </main>
 
     <footer>
         <% include partials/footer %>
     </footer>
-    
+
 </body>
 </html>
