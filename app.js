@@ -9,8 +9,8 @@ var port       = 8080 || process.env.port;
 
 // Init test users
 var users = [];
-users[0] = { name: "Mark Cockburn", email: "mark@localhost", password: "test", access: 10 }
-users[1] = { name: "Test Student", email: "test@localhost", password: "test", access: 1 }
+users[0] = { name: "Mark Cockburn", email: "mark@localhost", password: "test", school: "NRSIN15", access: 10 }
+users[1] = { name: "Test Student", email: "test@localhost", password: "test", school: "NRSIN15", access: 1 }
 
 // Enable modules & init
 app.set ( 'view engine', 'ejs' );
@@ -43,7 +43,7 @@ app.post ( '/login', function ( req, res )
   console.log (post) // debug
   users.forEach ( function ( user, index ) // Iterate through valid users and check credentials
   {
-    if ( ( user.email == post.email ) && ( user.password == post.passwd ) )
+    if ( ( user.email == post.email ) && ( user.password == post.passwd ) && ( user.school == post.school ) )
     { req.session.valid = true; req.session.user = users[index]; console.log ( users[index].name + " logged in" ) } // store user data in session
   });
   if ( !req.session.valid )
