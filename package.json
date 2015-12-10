@@ -16,6 +16,8 @@
     "express": "latest",
     "express-session": "latest",
     "body-parser": "latest",
+
+
     "socket.io": "latest",
     "passport": "latest",
     "ejs": "latest"

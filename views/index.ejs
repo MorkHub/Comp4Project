@@ -1,38 +1,38 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <% include partials/head %>
-</head>
-<body class="container">
+	<head>
+		<% include partials/head %>
+	</head>
+	<body class="container">
+		<header>
+			<% include partials/header %>
+		</header>
 
-    <header>
-        <% include partials/header %>
-    </header>
-
-    <main>
-        <div class="row">
-          <% include partials/error %>
-          <% if ( !valid ) { %>
-            <div class="col-sm-8">
-              <div class="jumbotron">
-                  <h1>You are not signed in</h1>
-                  <p>Please use the form to the right to sign in to access this service.</p>
-              </div>
-          <% } else { %>
-            <div class="col-sm-12">
-              <div class="jumbotron">
-                  <h1>Signed in! :-)</h1>
-                  <p>Thanks for signing in, please enjoy, <%= user.name %></p>
-              </div>
-          <% } %>
-            </div>
-            <% if ( !valid ) { %>
-              <% include partials/login %>
-            <% } else { %>
-              <% include partials/tasks %>
-            <% } %>
-        </div>
-    </main>
+		<main>
+			<div class="row">
+			<% include partials/error %>
+			<% if ( !valid ) { %>
+				<div class="col-sm-8">
+					<div class="jumbotron">
+						<h1>You are not signed in</h1>
+						<p>Please use the form to the right to sign in to access this service.</p>
+					</div>
+			<% } else { %>
+				<div class="col-sm-12">
+					<div class="jumbotron">
+						<h1>Signed in! :-)</h1>
+						<p>Thanks for signing in, please enjoy, <%= user.name %></p>
+					</div>
+			<% } %>
+				</div>
+			<% if ( !valid ) { %>
+				<% include partials/login %>
+			<% } %>
+			</div>
+		<% if ( valid ) { %>
+			<% include partials/tasks %>
+		<% } %>
+		</main>
 
     <footer>
         <% include partials/footer %>

@@ -25,9 +25,10 @@
                     <h1>Admin Panel</h1>
                     <p>Welcome to the admin panel, <%= user.name %></p>
                 </div>
+              <% users.forEach ( function ( users, i ) {  %>
                 <div class="panel panel-default">
                   <div class="panel-heading">
-                    <h3 class="panel-title">Users</h3>
+                    <h3 class="panel-title"><%= schools[i] %></h3>
                   </div>
                   <table class="table">
                     <tr>
@@ -37,17 +38,16 @@
                       <td>Access Level</td>
                     </tr>
                     <% users.forEach ( function ( u ) { %>
-                      <% if ( user.access >= 5 || user.school == u.school ) { %>
                       <tr>
                         <td><%= u.name %></td>
                         <td><%= u.email %></td>
                         <td><%= u.password %></td>
                         <td><%= u.access %></td>
                       </tr>
-                      <% } %>
                     <% }) %>
                   </table>
                 </div>
+              <% }) %>
             </div>
           </div>
         </div>

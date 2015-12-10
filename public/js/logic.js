@@ -4,7 +4,7 @@ var paper = new joint.dia.Paper({
 
     el: $('#paper'),
     model: graph,
-    width: el.width(), height: el.height(), gridSize: 5,
+    width: 800, height: 800, gridSize: 5,
     snapLinks: true,
     linkPinning: false,
     defaultLink: new joint.shapes.logic.Wire,

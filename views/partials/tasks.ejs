@@ -1,1 +1,7 @@
-<span>hi</span>
+<% for ( i = 0; i < tasks.length; i++ ) { %>
+	<div class="well">
+		<h1><%= tasks[i].name %></h1>
+		<div><%= tasks[i].desc %></div>
+		<span>This is a level <%= tasks[i].level %> task worth <%= tasks[i].value %>pts.</span>
+	</div>
+<% } %>
