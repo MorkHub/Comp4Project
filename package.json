@@ -1,34 +1,33 @@
 {
-  "name": "logix",
-  "version": "0.0.1",
-  "description": "Logic Gate sim server",
-  "main": "app.js",
-  "scripts": {
-    "test": "nodemon app.js",
-    "start": "node app.js"
-  },
-  "keywords": [
-    "logic"
-  ],
-  "author": "Mark Cockburn",
-  "license": "BSD-2-Clause",
-  "dependencies": {
-    "express": "latest",
-    "express-session": "latest",
-    "body-parser": "latest",
-
-
-    "socket.io": "latest",
-    "passport": "latest",
-    "ejs": "latest"
-  },
-  "devDependencies": {},
-  "repository": {
-    "type": "git",
-    "url": "git+https://github.com/MorkHub/test.git"
-  },
-  "bugs": {
-    "url": "https://github.com/MorkHub/test/issues"
-  },
-  "homepage": "https://github.com/MorkHub/test#readme"
+	"name": "logix",
+	"version": "0.0.1",
+	"description": "Logic Gate sim server",
+	"main": "app.js",
+	"scripts": {
+		"test": "nodemon app.js",
+		"start": "node app.js"
+	},
+	"keywords": [
+		"logic"
+	],
+	"author": "Mark Cockburn",
+	"license": "BSD-2-Clause",
+	"dependencies": {
+		"express": "latest",
+		"express-session": "latest",
+		"body-parser": "latest",
+		"socket.io": "latest",
+		"passport": "latest",
+		"ejs": "latest",
+		"nedb": "~1.5.0"
+	},
+	"devDependencies": {},
+	"repository": {
+		"type": "git",
+		"url": "git+https://github.com/MorkHub/test.git"
+	},
+	"bugs": {
+		"url": "https://github.com/MorkHub/test/issues"
+	},
+	"homepage": "https://github.com/MorkHub/test#readme"
 }

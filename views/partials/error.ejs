@@ -1,8 +1,8 @@
 <% if ( status !== undefined ) { %>
   <div class="col-sm-12">
-    <% if ( status.type == "success") { %><div class="alert alert-success" role="alert"><strong><%= status.title %></strong> <%= status.msg %></div><% } %>
-    <% if ( status.type == "info") { %><div class="alert alert-info" role="alert"><strong><%= status.title %></strong> <%= status.msg %></div><% } %>
-    <% if ( status.type == "warning") { %><div class="alert alert-warning" role="alert"><strong><%= status.title %></strong> <%= status.msg %></div><% } %>
-    <% if ( status.type == "danger") { %><div class="alert alert-danger" role="alert"><strong><%= status.title %></strong> <%= status.msg %></div><% } %>
+    <% if ( status.type == "success") { %><div class="alert alert-success" role="alert"><button type="button" class="close glyphicon glyphicon glyphicon-remove" data-dismiss="alert" aria-label="Close"></button><strong><%= status.title %></strong> <%= status.msg %></div><% } %>
+    <% if ( status.type == "info") { %><div class="alert alert-info" role="alert"><button type="button" class="close glyphicon glyphicon glyphicon-remov" data-dismiss="alert" aria-label="Close"></button><strong><%= status.title %></strong> <%= status.msg %></div><% } %>
+    <% if ( status.type == "warning") { %><div class="alert alert-warning" role="alert"><button type="button" class="close glyphicon glyphicon glyphicon-remov" data-dismiss="alert" aria-label="Close"></button><strong><%= status.title %></strong> <%= status.msg %></div><% } %>
+    <% if ( status.type == "danger") { %><div class="alert alert-danger" role="alert"><button type="button" class="close glyphicon glyphicon glyphicon-remov" data-dismiss="alert" aria-label="Close"></button><strong><%= status.title %></strong> <%= status.msg %></div><% } %>
   </div>
 <% } %>
