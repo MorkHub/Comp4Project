@@ -1,3 +1,4 @@
+// calculate the output signal
 var graph = new joint.dia.Graph();
 
 var paper = new joint.dia.Paper({
@@ -21,7 +22,7 @@ var paper = new joint.dia.Paper({
 
                 return (link.id !== vl.model.id &&
                         link.get('target').id === vt.model.id &&
-                        link.get('target').port === mt.getAttribute('port'));
+                        link.get('target').port === mt.getAttribute('port')); 
             });
 
             return !portUsed;
@@ -29,7 +30,7 @@ var paper = new joint.dia.Paper({
         } else { // e === 'source'
 
             // source requires an output port to connect
-            return ms && ms.getAttribute('class') && ms.getAttribute('class').indexOf('output') >= 0;
+            return ms && ms.getAttribute('class') && ms.getAttribute('class').indexOf('output') >= 0; 
         }
     }
 });
@@ -51,7 +52,7 @@ function initializeSignal() {
 
     var signal = Math.random();
     // > 0 wire with a positive signal is alive
-    // < 0 wire with a negative signal means, there is no signal
+    // < 0 wire with a negative signal means, there is no signal 
     // 0 none of the above - reset value
 
     // cancel all signals stores in wires
@@ -152,7 +153,7 @@ graph.on('change:signal', function(wire, signal) {
 
             // calculate the output signal
             var output = magnitude * (gate.operation.apply(gate, inputs) ? 1 : -1);
-
+            
             broadcastSignal(gate, output);
         });
    }

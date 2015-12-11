@@ -1,11 +1,12 @@
 // Inport modules
-var io         = require ( "socket.io" );
+var io         = require ( "socket.io" )( app );
 var ejs        = require ( "ejs" );
 var express    = require ( "express" );
 var session    = require ( "express-session" );
 var bodyParser = require ( "body-parser" );
+var db         = require ( "flat.js" );
 var app        = express ();
-var port       = 8080 || process.env.port;
+var port       = 25564 || process.env.port;
 
 // Init schools
 var schools = {};
@@ -19,6 +20,7 @@ for ( key in schools ) { users [ key ] = []; }
 users['NRSIN15'][0] = { name: "Mark Cockburn", email: "mcockburn14@sirisaac.net", avatar: "http://www.gravatar.com/avatar/f1585bee481d52a577afb56de9e2dcc7?rating=PG&size=50", password: "passwd", school: "NRSIN15", access: 10 }
 users['NRSIN15'][1] = { name: "Rick Sanchez", email: "rsanchez@sirisaac.net", avatar: "", password: "Morty12", school: "NRSIN15", access: 3 }
 users['NRSIN15'][2] = { name: "Emily Days", email: "edays14@sirisaac.net", avatar: "", password: "sirisaac1", school: "NRSIN15", access: 1 }
+users['NRSIN15'][3] = { name: "Oliver Barnwell", email: "obarnwell14@jacsin.org.uk", avatar: "http://www.gravatar.com/avatar/a52aeb58caa34d516873fa03d284d0b4?rating=PG&size=50", password: "gudjon", school: "NRSIN15", access: 1 }
 schools[ 'NRSIN15' ].tasks = [
 	{ name: "Easy assignment #1", desc: "Description of easy assignment", level: 1, value: 5, solution: "( a+b )" },
 	{ name: "Hard assignment #1", desc: "Description of hard assignment", level: 3, value: 20, solution: "( a+NOT( b.c ) )+( NOT( a+( b+c ) ) )" }
@@ -155,6 +157,16 @@ function auth ( req, res, next )
 		next();
 	}
 }
+
+// client-server communication
+io.on('connection', function (socket)
+{
+	socket.emit ( 'request', { data: "hello" });
+	socket.on ( 'response', function ( data ) {
+		console.log ( "data:", data.data );
+		console.log ( "user:", data.user ); 
+	});
+});
 
 // Listen on defined port, and print debug
 app.listen ( port, function ()

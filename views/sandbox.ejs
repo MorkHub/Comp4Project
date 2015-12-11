@@ -1,6 +1,6 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
+	<head>
     <% include partials/head %>
     <link rel="stylesheet" href="/css/joint.css">
     <link rel="stylesheet" href="/css/logic.css">
@@ -9,8 +9,8 @@
     <script src="/js/backbone-min.js"></script>
     <script src="/js/joint.js"></script>
     <script src="/js/logic.js"></script>
-</head>
-<body class="container">
+	</head>
+	<body class="container">
 
     <header>
         <% include partials/header %>
@@ -21,7 +21,7 @@
           <div class="col-sm-12">
             <div class="panel panel-default">
               <div class="panel-body">
-                <svg id="paper" style="background-color: white; border: 1px solid black" width="800" height="800"></svg>
+                <div id="paper" height="800" width="800"></div>
               </div>
             </div>
           </div>
@@ -31,5 +31,16 @@
     <footer>
         <% include partials/footer %>
     </footer>
-</body>
+
+		<script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>	
+		<script>
+			//var socket = io('http://localhost');
+			//socket.emit ( 'connect', { data: { me: "hi" }, user: { name: "mark", school: "NRSIN15" } } );
+			//socket.on ( 'broadcast', function ( data )
+			//{
+			//	console.log ( data );
+			//});
+		</script>
+		
+	</body>
 </html>
