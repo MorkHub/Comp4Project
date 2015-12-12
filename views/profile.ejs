@@ -21,9 +21,15 @@
             <div class="col-sm-12">
           <% } %>
                 <div class="jumbotron">
-                    <h1>You are logged in!</h1>
-                    <p>Hello, <%= user.name %></p>
-                    <img src="<%= user.avatar %>" height="64" width="64"/>
+                    <img class="pull-right img-circle" src="<%= user.avatar %>" height="96" width="96"/>
+                    <span class="h1"><%= user.name %></span>
+                    <p>
+                      <% if ( teacher.name !== user.name ) { %><strong>Teacher:</strong> <em><%= teacher.name %> of</em><% } else { %> Teacher at <% } %> <em><%= school.name %><br></em>
+                      <strong>Challenges Attempted:</strong> <%= user.tasksDone.length %><br>
+                      <strong>Challenges Due:</strong> <%= school.tasks.length %><br>
+                      <strong>Score:</strong> <%= user.score %><br>
+                      <strong>Grade:</strong> <%= user.grade %>
+                    </p>
                 </div>
             </div>
           </div>

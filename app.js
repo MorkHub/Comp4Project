@@ -6,29 +6,30 @@ var session    = require ( "express-session" );
 var bodyParser = require ( "body-parser" );
 var db         = require ( "flat.js" );
 var app        = express ();
-var port       = 25564 || process.env.port;
+var port       = ( process.env.computername == "ANNE" ) ? ( 80 ) : ( 25564 || process.env.port );
+var data       = require ( "./defines.js" );
 
 // Init schools
 var schools = {};
-schools [ 'NRSIN15' ] = { id: "NRSIN15", name: "Sir Isaac Newton Sixth Form", shortName: "SIN", logo: "/media/schools/NRSIN15/sin.png", tasks: []  };
-schools [ 'NRJAC15' ] = { id: "NRJAC16", name: "Jane Austen College", shortName: "JAC", logo: "/media/schools/NRJAC15/jac.png", tasks: []  };
+schools [ 'NRSIN15' ] = { id: "NRSIN15", name: "Sir Isaac Newton Sixth Form", shortName: "SIN", logo: "/media/schools/NRSIN15/sin.png", tasks: [] };
+schools [ 'NRJAC15' ] = { id: "NRJAC16", name: "Jane Austen College", shortName: "JAC", logo: "/media/schools/NRJAC15/jac.png", tasks: [] };
 
 // Init users
 var users = {}
 for ( key in schools ) { users [ key ] = []; }
 
-users['NRSIN15'][0] = { name: "Mark Cockburn", email: "mcockburn14@sirisaac.net", avatar: "http://www.gravatar.com/avatar/f1585bee481d52a577afb56de9e2dcc7?rating=PG&size=50", password: "passwd", school: "NRSIN15", access: 10 }
-users['NRSIN15'][1] = { name: "Rick Sanchez", email: "rsanchez@sirisaac.net", avatar: "", password: "Morty12", school: "NRSIN15", access: 3 }
-users['NRSIN15'][2] = { name: "Emily Days", email: "edays14@sirisaac.net", avatar: "", password: "sirisaac1", school: "NRSIN15", access: 1 }
-users['NRSIN15'][3] = { name: "Oliver Barnwell", email: "obarnwell14@jacsin.org.uk", avatar: "http://www.gravatar.com/avatar/a52aeb58caa34d516873fa03d284d0b4?rating=PG&size=50", password: "gudjon", school: "NRSIN15", access: 1 }
+users['NRSIN15'][0] = new data.User ( "Mark Cockburn", "mcockburn14", "mcockburn14@sirisaac.net", "passwd", "NRSIN15", 10, "http://www.gravatar.com/avatar/f1585bee481d52a577afb56de9e2dcc7?rating=PG&size=50", 1 );
+users['NRSIN15'][1] = new data.User ( "Rick Sanchez", "rsanchez", "rsanchez@sirisaac.net", "Morty12", "NRSIN15", 3, undefined, 1 )
+users['NRSIN15'][2] = { name: "Emily Days", email: "edays14@sirisaac.net", avatar: "", password: "sirisaac1", school: "NRSIN15", access: 1, teacher: 0 }
+users['NRSIN15'][3] = { name: "Oliver Barnwell", email: "obarnwell14@jacsin.org.uk", avatar: "http://www.gravatar.com/avatar/a52aeb58caa34d516873fa03d284d0b4?rating=PG&size=50", password: "gudjon", school: "NRSIN15", access: 1, teacher: 1 }
 schools[ 'NRSIN15' ].tasks = [
 	{ name: "Easy assignment #1", desc: "Description of easy assignment", level: 1, value: 5, solution: "( a+b )" },
 	{ name: "Hard assignment #1", desc: "Description of hard assignment", level: 3, value: 20, solution: "( a+NOT( b.c ) )+( NOT( a+( b+c ) ) )" }
 ];
 
-users['NRJAC15'][0] = { name: "John Doe", email: "jdoe15@janeausten.net", avatar: "", password: "janeausten1", school: "NRJAC15", access: 3 };
-users['NRJAC15'][1] = { name: "Luke Hazel", email: "lhazel15@janeausten.net", avatar: "", password: "janeausten1", school: "NRJAC15", access: 1 };
-users['NRJAC15'][2] = { name: "Alice Byrnes", email: "abyrnes15@janeausten.net", avatar: "", password: "janeausten1", school: "NRJAC15", access: 1 };
+users['NRJAC15'][0] = { name: "John Doe", email: "jdoe15@janeausten.net", avatar: "", password: "janeausten1", school: "NRJAC15", access: 3, teacher: 0 };
+users['NRJAC15'][1] = { name: "Luke Hazel", email: "lhazel15@janeausten.net", avatar: "", password: "janeausten1", school: "NRJAC15", access: 1, teacher: 0 };
+users['NRJAC15'][2] = { name: "Alice Byrnes", email: "abyrnes15@janeausten.net", avatar: "", password: "janeausten1", school: "NRJAC15", access: 1, teacher: 0 };
 
 // Lookup functions
 function lookupUser ( schoolID, email )
@@ -45,13 +46,15 @@ function lookupUser ( schoolID, email )
 
 function login ( post )
 {
-	console.log ( "Authenticting", post.email );
+	process.stdout.write ( "Authenticting " + post.email + " ");
 	var index = lookupUser ( post.school, post.email ); // check if user exists and get location
 	if ( index !== undefined ) // if user exists
 	{
 		// if valid password return user object, else return false for error handling
+		process.stdout.write ( "Success! Credentials valid\n" );
 		return ( users [ post.school ][ index ].password === post.passwd ) ? users [ post.school ][ index ] : false;
 	}
+	process.stdout.write ( "Failure! Credentials invalid\n" );
 	return false; // if conditions are not met, return false
 }
 
@@ -70,7 +73,7 @@ app.use ( express.static ( __dirname + '/public' ) ); // serve any content from 
 app.get ( '/', function ( req, res )
 {
 	tasks = ( req.session.user !== undefined ) ? ( schools[req.session.user.school].tasks ) : ( [] ) // holds task(s) data
-	var status = req.session.status || undefined; req.session.status = undefined; 
+	var status = req.session.status || undefined; req.session.status = undefined;
 	res.render ( 'index', { valid: req.session.valid, user: req.session.user, status: status, tasks: tasks } ); // render page, passing data to ejs template
 	; // initialise session data
 });
@@ -85,7 +88,8 @@ app.get ( '/sandbox', function ( req, res )
 app.get ( '/profile', auth, function ( req, res )
 {
 	var status = req.session.status || undefined; req.session.status = undefined;
-	res.render ( 'profile', { valid: req.session.valid, user: req.session.user, status: status } );
+	var teacher = users [ req.session.user.school ][ req.session.user.teacher ];
+	res.render ( 'profile', { valid: req.session.valid, user: req.session.user, school: schools[req.session.user.school], teacher: teacher, status: status } );
 });
 
 app.get ( '/admin', auth, function ( req, res )
@@ -104,7 +108,7 @@ app.get ( '/admin', auth, function ( req, res )
 	} else  {
 		sentUsers = [ users [ req.session.user.school ] ];
 		sentSchools = [ schools [ req.session.user.school ].name ];
-	}    
+	}
 	res.render ( 'admin', { valid: req.session.valid, user: req.session.user, schools: sentSchools, users: sentUsers, status: status } );
 	} else {
 		res.redirect ( '/' );
@@ -133,7 +137,7 @@ app.post ( '/login', function ( req, res )
 });
 
 app.get( '/school/:school', function ( req, res )
-{  
+{
 	var status = req.session.status || undefined; req.session.status = undefined;
 	res.send ( ( schools[req.params.school] !== undefined ) ? ( JSON.stringify( schools[req.params.school] ) ) : ( "null" ) )
 });
@@ -164,7 +168,7 @@ io.on('connection', function (socket)
 	socket.emit ( 'request', { data: "hello" });
 	socket.on ( 'response', function ( data ) {
 		console.log ( "data:", data.data );
-		console.log ( "user:", data.user ); 
+		console.log ( "user:", data.user );
 	});
 });
 
