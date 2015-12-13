@@ -5,7 +5,7 @@ module.exports = {
     this.id;
     this.name = name || "John Smith";
     this.email = email || "jsmith@mail.com";
-    this.username = username || this.email.substring ( 0, this.email.indexOf("@") );
+    this.username = username;
     this.password = password || "password123";
     this.school = school || "";
     this.access = parseInt ( access ) || 1;

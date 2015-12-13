@@ -1,61 +1,85 @@
-// Inport modules
-var io         = require ( "socket.io" )( app );
-var ejs        = require ( "ejs" );
-var express    = require ( "express" );
-var session    = require ( "express-session" );
-var bodyParser = require ( "body-parser" );
-var db         = require ( "flat.js" );
-var app        = express ();
 var port       = ( process.env.computername == "ANNE" ) ? ( 80 ) : ( 25564 || process.env.port );
-var data       = require ( "./defines.js" );
+// Inport modules
+var io         = require ( "socket.io" )( app ),
+    session    = require ( "express-session" ),
+    bodyParser = require ( "body-parser" ),
+		data       = require ( "./defines.js" ),
+		express    = require ( "express" ),
+    flat       = require ( "flat.js" ),
+		ejs        = require ( "ejs" ),
+    app        = express ();
+
+// database initialisation
+var db = flat ( "store.db", { persist: true } );
 
 // Init schools
 var schools = {};
-schools [ 'NRSIN15' ] = { id: "NRSIN15", name: "Sir Isaac Newton Sixth Form", shortName: "SIN", logo: "/media/schools/NRSIN15/sin.png", tasks: [] };
-schools [ 'NRJAC15' ] = { id: "NRJAC16", name: "Jane Austen College", shortName: "JAC", logo: "/media/schools/NRJAC15/jac.png", tasks: [] };
+var users = {}
+//schools['NRSIN15'] = {}
+//schools['NRJAC15'] = {}
+//for ( key in schools ) { users [ key ] = []; }
+//users['NRSIN15'] = {}
+//users['NRJAC15'] = {}
+//schools [ 'NRSIN15' ] = { id: "NRSIN15", name: "Sir Isaac Newton Sixth Form", shortName: "SIN", logo: "/media/schools/NRSIN15/sin.png", tasks: [] };
+//schools [ 'NRJAC15' ] = { id: "NRJAC16", name: "Jane Austen College", shortName: "JAC", logo: "/media/schools/NRJAC15/jac.png", tasks: [] };
+
+update();
+
+
 
 // Init users
-var users = {}
-for ( key in schools ) { users [ key ] = []; }
 
-users['NRSIN15'][0] = new data.User ( "Mark Cockburn", "mcockburn14", "mcockburn14@sirisaac.net", "passwd", "NRSIN15", 10, "http://www.gravatar.com/avatar/f1585bee481d52a577afb56de9e2dcc7?rating=PG&size=50", 1 );
-users['NRSIN15'][1] = new data.User ( "Rick Sanchez", "rsanchez", "rsanchez@sirisaac.net", "Morty12", "NRSIN15", 3, undefined, 1 )
-users['NRSIN15'][2] = { name: "Emily Days", email: "edays14@sirisaac.net", avatar: "", password: "sirisaac1", school: "NRSIN15", access: 1, teacher: 0 }
-users['NRSIN15'][3] = { name: "Oliver Barnwell", email: "obarnwell14@jacsin.org.uk", avatar: "http://www.gravatar.com/avatar/a52aeb58caa34d516873fa03d284d0b4?rating=PG&size=50", password: "gudjon", school: "NRSIN15", access: 1, teacher: 1 }
+
+/*
+users['NRSIN15'][0] = new data.User ( "Mark Cockburn", "mcockburn14", "mcockburn14@sirisaac.net", "passwd", "NRSIN15", 10, "http://www.gravatar.com/avatar/	f1585bee481d52a577afb56de9e2dcc7?rating=PG&size=50", 1 );
+users['NRSIN15'][1] = new data.User ( "Rick Sanchez", "rsanchez", "rsanchez@sirisaac.net", "Morty12", "NRSIN15", 3, undefined, 1 );
+users['NRSIN15'][2] = new data.User ( "Emily Days", "edays14", "edays14@sirisaac.net", "sirisaac1", "NRSIN15", 1, undefined, 0 );
+users['NRSIN15'][3] = new data.User ( "Oliver Barnwell", "lyathon", "obarnwell14@jacsin.org.uk", "toady53", "NRSIN15", 1, undefined, 1 );
 schools[ 'NRSIN15' ].tasks = [
 	{ name: "Easy assignment #1", desc: "Description of easy assignment", level: 1, value: 5, solution: "( a+b )" },
 	{ name: "Hard assignment #1", desc: "Description of hard assignment", level: 3, value: 20, solution: "( a+NOT( b.c ) )+( NOT( a+( b+c ) ) )" }
 ];
-
-users['NRJAC15'][0] = { name: "John Doe", email: "jdoe15@janeausten.net", avatar: "", password: "janeausten1", school: "NRJAC15", access: 3, teacher: 0 };
-users['NRJAC15'][1] = { name: "Luke Hazel", email: "lhazel15@janeausten.net", avatar: "", password: "janeausten1", school: "NRJAC15", access: 1, teacher: 0 };
-users['NRJAC15'][2] = { name: "Alice Byrnes", email: "abyrnes15@janeausten.net", avatar: "", password: "janeausten1", school: "NRJAC15", access: 1, teacher: 0 };
+users['NRJAC15'][0] = new data.User ( "John Doe", "jdoe15", "jdoe15@janeausten.net", "janeausten1", "NRJAC15", 3, undefined, 0 )
+users['NRJAC15'][1] = new data.User ( "Luke Hazel", "lhazel15", "lhazel15@janeausten.net", "janeausten1", "NRJAC15", 1, undefined, 0 );
+users['NRJAC15'][2] = new data.User ( "Alice Byrnes", "abyrnes15", "abyrnes15@janeausten.net", "janeausten1", "NRJAC15", 1, undefined, 0 );
+*/
 
 // Lookup functions
 function lookupUser ( schoolID, email )
 {
-	if ( users [ schoolID ] !== undefined ) // if specified school exists
+	var temp = db.getTable ( "users" );
+	for ( key in temp )
 	{
-		for ( i = 0; i < users [ schoolID ].length; i++  ) // iterate through each school
+		if ( temp[key].school == schoolID )
 		{
-			if ( users [ schoolID ][i].email == email ) return i; // if user found, then return its index in array
+			if ( temp[key].email == email )
+			{
+				return temp[key];
+			}
 		}
 	}
-	return undefined; // if any of above conditions are not met, return undefined
 }
 
 function login ( post )
 {
 	process.stdout.write ( "Authenticting " + post.email + " ");
-	var index = lookupUser ( post.school, post.email ); // check if user exists and get location
-	if ( index !== undefined ) // if user exists
+  update();
+	var u = lookupUser ( post.school, post.email ); // check if user exists and if so retrieve user
+	if ( u !== undefined ) // if user exists
 	{
 		// if valid password return user object, else return false for error handling
 		process.stdout.write ( "Success! Credentials valid\n" );
-		return ( users [ post.school ][ index ].password === post.passwd ) ? users [ post.school ][ index ] : false;
+		return ( u.password === post.passwd ) ? u : false;
 	}
 	process.stdout.write ( "Failure! Credentials invalid\n" );
 	return false; // if conditions are not met, return false
+}
+
+function update()
+{
+  db.openSync("utf8");
+  users = db.getTable("users");
+  schools = db.getTable("schools");
 }
 
 // Init tasks
@@ -69,6 +93,7 @@ app.use ( session ( { secret: "isaacnewton", resave: true, saveUninitialized: tr
 
 // Routes
 app.use ( express.static ( __dirname + '/public' ) ); // serve any content from public/
+require('./routes')(app, db, ejs);
 
 app.get ( '/', function ( req, res )
 {
@@ -87,29 +112,32 @@ app.get ( '/sandbox', function ( req, res )
 
 app.get ( '/profile', auth, function ( req, res )
 {
-	var status = req.session.status || undefined; req.session.status = undefined;
-	var teacher = users [ req.session.user.school ][ req.session.user.teacher ];
-	res.render ( 'profile', { valid: req.session.valid, user: req.session.user, school: schools[req.session.user.school], teacher: teacher, status: status } );
+  var status = req.session.status || undefined;
+  req.session.status = undefined;
+  update();
+  console.log(schools[req.session.user.school])
+	res.render ( 'profile', {
+    valid: req.session.valid,
+    user: users[req.session.user.username],
+    school: schools[req.session.user.school],
+    teacher: users[req.session.user.teacher],
+    status: status
+  });
 });
 
 app.get ( '/admin', auth, function ( req, res )
 {
-	var status = req.session.status || undefined; req.session.status = undefined;
+	var status = req.session.status || undefined;
+  req.session.status = undefined;
+  update();
 	if ( req.session.user.access >= 3 )
 	{
-	var sentUsers = [], sentSchools = [];
-	if ( req.session.user.access >=7 )
-	{
-		for ( key in schools )
-		{
-			sentUsers.push ( users [ key ] );
-			sentSchools.push ( schools [ key ].name );
-		}
-	} else  {
-		sentUsers = [ users [ req.session.user.school ] ];
-		sentSchools = [ schools [ req.session.user.school ].name ];
-	}
-	res.render ( 'admin', { valid: req.session.valid, user: req.session.user, schools: sentSchools, users: sentUsers, status: status } );
+	   res.render ( 'admin', {
+       valid: req.session.valid,
+       user: req.session.user,
+       schools: schools,
+       users: users,
+       status: status } );
 	} else {
 		res.redirect ( '/' );
 	}
@@ -144,7 +172,7 @@ app.get( '/school/:school', function ( req, res )
 
 // Logs out ( deletes session data )
 app.get ( '/logout', function ( req, res ) {
-	console.log ( "  -",  req.session.user.name, "has signed out." );
+	try { console.log ( "  -",  req.session.user.name, "has signed out." ) } catch (e) { }
 	req.session.user = undefined;
 	req.session.valid = false;
 	req.session.status = { type: "info", title: "Goodbye.", msg: "Logged out. See you again soon." };
