@@ -13,7 +13,7 @@
     <main>
         <div class="row">
           <% include partials/error %>
-          <% if ( !valid ) { %>
+          <% if ( user_id == undefined ) { %>
             <div class="col-sm-12">
               <div class="alert alert-success" role="alert"><strong>Not signed ion!</strong> please sign in!</div>
             </div>
@@ -39,12 +39,12 @@
                     </tr>
                     <% for ( uKey in users ) { %>
                       <% if ( users[uKey].school == sKey ) { %>
-                      <tr>
-                        <td><%= users[uKey].name %></td>
-                        <td><%= users[uKey].email %></td>
-                        <td><%= users[uKey].password %></td>
-                        <td><%= users[uKey].access %></td>
-                      </tr>
+                        <tr>
+                          <td><a href="/user/<%= users[uKey].username %>"><%= users[uKey].name %></a></td>
+                          <td><%= users[uKey].email %></td>
+                          <td><%= users[uKey].password %></td>
+                          <td><%= users[uKey].access %></td>
+                        </tr>
                       <% } %>
                     <% } %>
                   </table>

@@ -11,29 +11,33 @@
 
     <main>
         <div class="row">
-          <% include partials/error %>
-          <% if ( !valid ) { %>
-            <div class="col-sm-12">
-              <div class="alert alert-success" role="alert"><strong>Not signed ion!</strong> please sign in!</div>
-            </div>
-            <% include partials/login %>
+          <% if ( user_id == undefined ) { %>
+            <div class="col-md-8">
+              <% include partials/error %>
+              <div class="alert alert-info" role="alert"><strong>Logged out!</strong> please sign in!</div>
           <% } else { %>
-            <div class="col-sm-12">
+            <div class="col-md-12">
           <% } %>
                 <div class="jumbotron">
+                  <% if ( user !== undefined ) { %>
                     <img class="pull-right img-circle" src="<%= user.avatar %>" height="96" width="96"/>
                     <span class="h1"><%= user.name %></span>
                     <p>
-                      <% if ( teacher.name !== user.name ) { %><strong>Teacher:</strong> <em><%= teacher.name %> of</em><% } else { %> Teacher at <% } %> <em><%= school.name %><br></em>
+                      <% if ( teacher.name !== user.name ) { %><strong>Teacher:</strong> <em><a href="/user/<%= teacher.username %>"><%= teacher.name %></a> of</em><% } else { %> Teacher at <% } %> <em><%= school.name %><br></em>
                       <strong>Challenges Attempted:</strong> <%= user.tasksDone.length %><br>
                       <strong>Challenges Due:</strong> <%= school.tasks.length %><br>
                       <strong>Score:</strong> <%= user.score %><br>
                       <strong>Grade:</strong> <%= user.grade %>
                     </p>
+                  <% } else { %>
+                    <span class="h1">User not found.</span>
+                  <% } %>
                 </div>
             </div>
+              <% if ( user_id == undefined ) { %>
+                <% include partials/login %>
+              <% } %>
           </div>
-        </div>
     </main>
 
     <footer>

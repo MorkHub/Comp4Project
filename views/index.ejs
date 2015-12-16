@@ -11,11 +11,11 @@
 		<main>
 			<div class="row">
 			<% include partials/error %>
-			<% if ( !valid ) { %>
+			<% if ( user_id == undefined ) { %>
 				<div class="col-sm-8">
 					<div class="jumbotron">
 						<h1>You are not signed in</h1>
-						<p>Please use the form to the right to sign in to access this service.</p>
+						<p>Please use the login form to sign in to access this service.</p>
 					</div>
 			<% } else { %>
 				<div class="col-sm-12">
@@ -25,11 +25,11 @@
 					</div>
 			<% } %>
 				</div>
-			<% if ( !valid ) { %>
+			<% if ( user_id == undefined ) { %>
 				<% include partials/login %>
 			<% } %>
 			</div>
-		<% if ( valid ) { %>
+		<% if ( user_id !== undefined ) { %>
 			<% include partials/tasks %>
 		<% } %>
 		</main>
