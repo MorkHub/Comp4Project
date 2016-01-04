@@ -8,5 +8,9 @@ Basic node.js learning platform for schools
 | crypto | ^0.0.3 |
 | crypto-js | ^3.1.5 |
 | ejs |  |
+| express |  |
+| express-session |  |
+| flat.js |  |
+| md5 |  |
 |  |  |
 |  |  |
