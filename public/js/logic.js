@@ -1,11 +1,11 @@
 // calculate the output signal
+var divPaper = $( '#paper' );
 var graph = new joint.dia.Graph();
-
 var paper = new joint.dia.Paper({
 
-    el: $('#paper'),
+    el: divPaper,
     model: graph,
-    width: 800, height: 800, gridSize: 5,
+    width: divPaper.width(), height: 800, gridSize: 1,
     snapLinks: true,
     linkPinning: false,
     defaultLink: new joint.shapes.logic.Wire,
@@ -88,13 +88,13 @@ joint.shapes.logic.Output.prototype.onSignal = function(signal) {
 
 var gates = {
     repeater: new joint.shapes.logic.Repeater({ position: { x: 410, y: 25 }}),
-    or: new joint.shapes.logic.Or({ position: { x: 550, y: 50 }}),
-    and: new joint.shapes.logic.And({ position: { x: 550, y: 150 }}),
+    or: new joint.shapes.logic.Or({ position: { x: Math.floor( paper.svg.clientWidth / 1.5 ) - 100, y: 20 }}),
+    and: new joint.shapes.logic.And({ position: { x: Math.floor( paper.svg.clientWidth / 1.5 ) - 100, y: 70 }}),
     not: new joint.shapes.logic.Not({ position: { x: 90, y: 140 }}),
-    nand: new joint.shapes.logic.Nand({ position: { x: 550, y: 250 }}),
+    nand: new joint.shapes.logic.Nand({ position: { x: Math.floor( paper.svg.clientWidth / 1.5 ) - 100, y: 120 }}),
     nor: new joint.shapes.logic.Nor({ position: { x: 270, y: 190 }}),
-    xor: new joint.shapes.logic.Xor({ position: { x: 550, y: 200 }}),
-    xnor: new joint.shapes.logic.Xnor({ position: { x: 550, y: 100 }}),
+    xor: new joint.shapes.logic.Xor({ position: { x: Math.floor( paper.svg.clientWidth / 1.5 ) - 100, y: 170 }}),
+    xnor: new joint.shapes.logic.Xnor({ position: { x: Math.floor( paper.svg.clientWidth / 1.5 ) - 100, y: 220 }}),
     input: new joint.shapes.logic.Input({ position: { x: 5, y: 45 }}),
     output: new joint.shapes.logic.Output({ position: { x: 440, y: 290 }})
 };
