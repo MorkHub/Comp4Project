@@ -16,18 +16,19 @@
               <% include partials/error %>
               <div class="alert alert-info" role="alert"><strong>Logged out!</strong> please sign in!</div>
           <% } else { %>
+						<% include partials/error %>
             <div class="col-md-12">
           <% } %>
                 <div class="jumbotron">
-                  <% if ( user !== undefined ) { %>
-                    <img class="pull-right img-circle" src="<%= user.avatar %>" height="96" width="96"/>
-                    <span class="h1"><%= user.name %></span>
+                  <% if ( targetUser !== undefined ) { %>
+                    <img class="pull-right img-circle" src="<%= targetUser.avatar %>" height="96" width="96"/>
+                    <span class="h1"><%= targetUser.name %></span><% if( targetUser == targetUser) { %><a href="/user/<%= targetUser.username  %>/edit/"><span class="glyphicon glyphicon-pencil"></span></a><% } %>
                     <p>
-                      <% if ( teacher.name !== user.name ) { %><strong>Teacher:</strong> <em><a href="/user/<%= teacher.username %>"><%= teacher.name %></a> of</em><% } else { %> Teacher at <% } %> <em><%= school.name %><br></em>
-                      <strong>Challenges Attempted:</strong> <%= user.tasksDone.length %><br>
+                      <% if ( teacher.name !== targetUser.name ) { %><strong>Teacher:</strong> <em><a href="/user/<%= teacher.username %>"><%= teacher.name %></a> of</em><% } else { %> Teacher at <% } %> <em><%= school.name %><br></em>
+                      <strong>Challenges Attempted:</strong> <%= targetUser.tasksDone.length %><br>
                       <strong>Challenges Due:</strong> <%= school.tasks.length %><br>
-                      <strong>Score:</strong> <%= user.score %><br>
-                      <strong>Grade:</strong> <%= user.grade %>
+                      <strong>Score:</strong> <%= targetUser.score %><br>
+                      <strong>Grade:</strong> <%= targetUser.grade %>
                     </p>
                   <% } else { %>
                     <span class="h1">User not found.</span>

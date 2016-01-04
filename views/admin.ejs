@@ -25,31 +25,38 @@
                     <h1>Admin Panel</h1>
                     <p>Welcome to the admin panel, <%= user.name %></p>
                 </div>
-              <% for ( sKey in schools ) { %>
+              <% for ( sKey in schools ) { if ( user.school == sKey || user.access >= 10 ) { %>
                 <div class="panel panel-default">
                   <div class="panel-heading">
                     <h3 class="panel-title"><%= schools[sKey].name %><span class="pull-right"><%= sKey %></span></h3>
                   </div>
-                  <table class="table">
-                    <tr>
-                      <td>Name</td>
-                      <td>Email</td>
-                      <td>Password</td>
-                      <td>Access Level</td>
-                    </tr>
+									<div class="row">
                     <% for ( uKey in users ) { %>
                       <% if ( users[uKey].school == sKey ) { %>
-                        <tr>
-                          <td><a href="/user/<%= users[uKey].username %>"><%= users[uKey].name %></a></td>
-                          <td><%= users[uKey].email %></td>
-                          <td><%= users[uKey].password %></td>
-                          <td><%= users[uKey].access %></td>
-                        </tr>
+													<div class="col-sm-6 col-md-3">
+														<div class="thumbnail">
+															<img src="<%= users[uKey].avatar %>" alt="<%= users[uKey].username %>" width="100%" height="auto">
+															<div class="caption">
+																<h3><%= users[uKey].name %>
+																	<% if ( users[uKey].access <=1 ) { %><span class="badge">Student</span>
+																	<% } else if ( users[uKey].access <= 3 ) { %><span class="badge">Teacher</span>
+																	<% } else if ( users[uKey].access <=5 ) { %><span class="badge">Manager</span>
+																	<% } else if ( users[uKey].access <=10 ) { %><span class="badge">Admin</span><% } %>
+																</h3>
+																<p></p>
+																<p>
+																	<a <% if ( user.access >= users[uKey].access ) { %>href="/user/<%= users[uKey].username %>/edit"<% } %> class="btn btn-primary" role="button">Edit</a> 
+																	<a href="/user/<%= users[uKey].username %>/" class="btn btn-default" role="button">View</a>
+																	<% if ( users[uKey].access < 10 && users[uKey].access <= user.access ) { %><a href="/delete_user/<%= users[uKey].username %>/" class="btn btn-danger" role="button">Delete</a><% } %>
+																</p>
+															</div>
+														</div>
+													</div>
                       <% } %>
                     <% } %>
-                  </table>
+									</div>
                 </div>
-              <% } %>
+              <% } } %>
             </div>
           </div>
         </div>
