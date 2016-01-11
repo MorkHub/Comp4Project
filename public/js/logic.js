@@ -86,7 +86,7 @@ joint.shapes.logic.Output.prototype.onSignal = function(signal) {
 
 // diagramm setup
 
-var gates = {
+var gates = gates || {
     repeater: new joint.shapes.logic.Repeater({ position: { x: 410, y: 25 }}),
     or: new joint.shapes.logic.Or({ position: { x: Math.floor( paper.svg.clientWidth / 1.5 ) - 100, y: 20 }}),
     and: new joint.shapes.logic.And({ position: { x: Math.floor( paper.svg.clientWidth / 1.5 ) - 100, y: 70 }}),
@@ -100,7 +100,7 @@ var gates = {
 };
 
 
-var wires = [
+var wires = wires || [
     { source: { id: gates.input.id, port: 'out' }, target: { id: gates.not.id, port: 'in' }},
     { source: { id: gates.not.id, port: 'out' }, target: { id: gates.nor.id, port: 'in1' }},
     { source: { id: gates.nor.id, port: 'out' }, target: { id: gates.repeater.id, port: 'in' }},
