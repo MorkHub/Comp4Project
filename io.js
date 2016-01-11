@@ -15,7 +15,7 @@ module.exports = function ( app, db, io, host, crypto )
 	
 		socket.on ( 'login', function ( data )
 		{
-			db.openSync ( "utf8"  );
+			db.openSync ( "utf8" );
 			var usr = crypto.decrypt ( data.usr );
 			var pwd = crypto.decrypt ( data.pwd );
 			if ( db.checkFieldExists ( "users", usr ) )
