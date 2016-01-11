@@ -9,42 +9,59 @@ module.exports = function ( app, db, io, host, crypto )
 	{
 		socket.emit ( 'broadcast', "Connected! :-)");
 		socket.emit ( 'connected' );
-		//console.log ( socket )
 		socket.on ( 'gate_data', function ( data ) {
-			//var gates = data.gates;
-			//var user  = data.user;
-			//console.log ( data );
 			socket.emit ( 'broadcast', "Thanks for the data!" );
 		});
-	});
-	io.on ( 'login', function ( data )
-	{
-		db.openSync ( "utf8"  );
-		process.stdout.write ( "usr: " + data.usr + "\npwd: " + data.pwd + "\n");
-		var usr = crypto.decrypt ( data.usr );
-		var pwd = crypto.decrypt ( data.pwd );
-		process.stdout.write ( "usr: " + usr + "\npwd: " + pwd );
-		if ( db.checkFieldExists ( "users", usr ) )
+	
+		socket.on ( 'login', function ( data )
 		{
-			var user = db.getField ( "users", usr );
-			if ( user.password === pwd )
+			db.openSync ( "utf8"  );
+			var usr = crypto.decrypt ( data.usr );
+			var pwd = crypto.decrypt ( data.pwd );
+			if ( db.checkFieldExists ( "users", usr ) )
 			{
-				console.log ( "  + " + user.name + " has signed in (sandbox)" ); 
-				socket.emit ( "login_response", { name: user.name, id: data.user_id, } )
+				var user = db.getField ( "users", usr );
+				if ( user.password === pwd )
+				{
+					console.log ( "  + " + user.name + " has signed in (sandbox)" ); 
+					socket.emit ( "login_response", { name: user.name, username: user.username } )
+				}
 			}
-		}
-	});
-	io.on ( 'save_data', function ( data )
-	{
-		db.Async( "utf8", function()
+		});
+		socket.on ( 'save_data', function ( data )
 		{
-			if ( db.checkFieldExists ( "users", data.user.username ) )
+			db.openAsync( "utf8", function()
 			{
-				var user = db.getField ( "users", data.user );
-				user.files = user.files || [];
-				user.files [ data.saveData.project.name ] = data.saveData;
-				db.set ( "users", data.user.username, user );
-			}
+				if ( db.checkFieldExists ( "users", data.user.username ) )
+				{
+					var user = db.getField ( "users", data.user.username );
+					user.files = user.files || {};
+					user.files [ data.saveData.project.name ] = data.saveData;
+					console.log ( "User, " + user.username + ", uploaded " + data.saveData.project.name + "\"" +  data.saveData.project.desc + "\" by " + data.saveData.project.author + "." );
+					db.set ( "users", data.user.username, user );
+				}
+			});
+		});
+		
+		socket.on ( 'load_data', function ( data )
+		{
+			var user = data.user,
+					target = data.target;
+			user.username = crypto.decrypt ( user.username );
+			user.password = crypto.decrypt ( user.password );
+			db.openAsync ( "utf8", function()
+			{
+				if ( db.checkFieldExists ( "users", user.username ) )
+				{
+					var userObj = db.getField ( "users", user.username );
+					var saveData = userObj.files[target] || { gates: {}, wires: {}, project: { name: "", desc: "",author: "" } };
+					if ( user.password = userObj.password && saveData.project.name.trim() !== "" )
+					{
+						console.log ( "User, " + user.username + ", loaded project " + saveData.project.name + " \"" + saveData.project.desc + "\" by " + saveData.project.author + "." );
+						socket.emit ( "load_data", saveData);
+					}
+				} else { socket.emit ( 'load_error', { type: "danger", title: "Load error", msg: "User not found." } ); }
+			});
 		});
 	});
 }
