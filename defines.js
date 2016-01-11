@@ -32,8 +32,8 @@ module.exports = {
     this.access = parseInt ( access ) || 1;
     if ( avatar )
 		{
-			this.avatar = avatar.replace (/ /g, "%20" ) } else { this.avatar = "/media/schools/" + this.school + "/users/" + this.username + "/avatar.png"
-			mkdir ( username, school )
+			this.avatar = avatar.replace (/ /g, "%20" ) } else { this.avatar = "/media/schools/" + this.school + "/users/" + this.username + "/avatar.png";
+			mkdir ( username, school );
 		};
     this.id = md5 (
       this.name.replace ( / /g, "" ) +
@@ -45,34 +45,36 @@ module.exports = {
     this.tasksDone = [];
     this.score = this.name.length * 6;
     this.grade = grade ( this.score, 100 );
-    this.teacher = teacher || "rsanchez14";
+    this.teacher = teacher || "rsanchez";
   }.bind(this),
 	RemoveUser : function ( username, school )
 	{
-		if ( school !== undefined )
+		if ( school !== undefined ) 
 		{
 			rmdir ( username, school )
 		}
-	}
+	},
+	grade: grade
 }
 
-function grade ( score, total )
+function grade ( score, max )
 {
-  var points = ( ( total !== 0 ) ? ( score / total ) : 0 ) * 100;
-  var index = Math.ceil ( points / 10 )
-  if ( index <= 0 ) index = 0;
-  if ( index >= 100 ) index = 0;
-  var grades = [
-    "U",
-    "U",
-    "F",
-    "G",
-    "E",
-    "D",
-    "C",
-    "B",
-    "A",
-    "A*",
-  ];
-  return grades [ Math.ceil ( points / 10 ) ];
+	score = Math.min ( score, max ); // Prevents score being greater than total
+	total = Math.max ( 0, max ); // Prevents Total being less than zero
+	var points = Math.min ( Math.max ( 0, score/max ), 100 ) * 100; // Safely calculate percentage
+	var index = Math.min ( Math.max ( Math.ceil ( points / 10 ), 0 ), 10 ); // Find bounds in arrow, additionally fixes calc error
+	var grades = [
+		"U",
+		"U",
+		"U",
+		"U",
+		"F",
+		"E",
+		"D",
+		"C",
+		"B",
+		"A",
+		"A*"
+	];
+	return grades [ index ] || "U"; // Defaults to 'U' if still fails
 }
