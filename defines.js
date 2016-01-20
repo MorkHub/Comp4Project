@@ -21,13 +21,14 @@ function rmdir ( user, school )
 }
 
 module.exports = {
-  User : function ( name, username, password, school, access, teacher, avatar )
+  User : function ( name, username, password, school, access, teacher, valid, avatar )
   {
     this.id;
     this.name = name || "John Smith";
     // this.email = email || "jsmith@mail.com";
     this.username = username;
     this.password = password || "password123";
+		this.valid = valid || false;
     this.school = school || "";
     this.access = parseInt ( access ) || 1;
     if ( avatar )
