@@ -1,6 +1,44 @@
+// Extend joint logic
+/*
+.element .body {
+    fill: #68DDD5;
+    stroke: #44CCC3;
+    stroke-opacity: 0.5;
+    transition: all 0.2s;
+}
+*/
+joint.shapes.logic.InputOn = joint.shapes.logic.IO.extend({
+  defaults: joint.util.deepSupplement({
+    type: 'logic.InputOn',
+    size : { width: 30, height: 30},
+    attrs: {
+			'.body': { fill: '#FEB662', stroke: '#CF9452', 'stroke-width': 2 },
+      '.wire': { 'ref-dx': 0, d: 'M 0 0 L 23 0' },
+      circle: { ref: '.body', 'ref-dx': 30, 'ref-y': 0.5, magnet: true, 'class': 'output', port: 'out' },
+      text: { text: '1' }
+    }
+  }, joint.shapes.logic.IO.prototype.defaults),
+  operation: function () { return true; }
+});
+
+joint.shapes.logic.InputOff = joint.shapes.logic.IO.extend({
+  defaults: joint.util.deepSupplement({
+    type: 'logic.InputOff',
+    size : { width: 30, height: 30},
+    attrs: {
+			'.body': { fill: '#68DDD5', stroke: '#44CCC3', 'stroke-width': 2 },
+      '.wire': { 'ref-dx': 0, d: 'M 0 0 L 23 0' },
+      circle: { ref: '.body', 'ref-dx': 30, 'ref-y': 0.5, magnet: true, 'class': 'output', port: 'out' },
+      text: { text: '0' }
+    }
+  }, joint.shapes.logic.IO.prototype.defaults),
+  operation: function () { return false; }
+});
+
 // calculate the output signal
 var divPaper = $( '#paper' );
 var graph = new joint.dia.Graph();
+
 var paper = new joint.dia.Paper({
 
     el: divPaper,
@@ -65,7 +103,8 @@ function initializeSignal() {
 
     _.each(graph.getElements(), function(element) {
         // broadcast a new signal from every input in the graph
-        (element instanceof joint.shapes.logic.Input) && broadcastSignal(element, signal);
+        (element instanceof joint.shapes.logic.InputOn) && broadcastSignal(element, signal);
+       	(element instanceof joint.shapes.logic.InputOff) && broadcastSignal(element, 0 - signal);
     });
 
     return signal;
@@ -95,13 +134,14 @@ var gates = gates || {
     nor: new joint.shapes.logic.Nor({ position: { x: 270, y: 190 }}),
     xor: new joint.shapes.logic.Xor({ position: { x: Math.floor( paper.svg.clientWidth / 1.5 ) - 100, y: 170 }}),
     xnor: new joint.shapes.logic.Xnor({ position: { x: Math.floor( paper.svg.clientWidth / 1.5 ) - 100, y: 220 }}),
-    input: new joint.shapes.logic.Input({ position: { x: 5, y: 45 }}),
+    on: new joint.shapes.logic.InputOn({ position: { x: 5, y: 45 }}),
+    off: new joint.shapes.logic.InputOff({ position: { x: 5, y: 90 }}),
     output: new joint.shapes.logic.Output({ position: { x: 440, y: 290 }})
 };
 
 
 var wires = wires || [
-    { source: { id: gates.input.id, port: 'out' }, target: { id: gates.not.id, port: 'in' }},
+    { source: { id: gates.on.id, port: 'out' }, target: { id: gates.not.id, port: 'in' }},
     { source: { id: gates.not.id, port: 'out' }, target: { id: gates.nor.id, port: 'in1' }},
     { source: { id: gates.nor.id, port: 'out' }, target: { id: gates.repeater.id, port: 'in' }},
     { source: { id: gates.nor.id, port: 'out' }, target: { id: gates.output.id, port: 'in' }},
