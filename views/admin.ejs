@@ -21,9 +21,11 @@
           <% } else { %>
             <div class="col-sm-12">
           <% } %>
-                <div class="jumbotron">
-                    <h1>Admin Panel</h1>
-                    <p>Welcome to the admin panel, <%= user.name %></p>
+                <div class="panel panel-default">
+										<div class="panel-body">
+												<a class="btn btn-success" href="/admin/add_user">Add User</a>
+												<a class="btn btn-primary" href="/admin/add_school">Add School</a>
+										</div>
                 </div>
               <% for ( sKey in schools ) { if ( user.school == sKey || user.access >= 10 ) { %>
                 <div class="panel panel-default">

@@ -24,18 +24,15 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 
 	function validUser ( post )
 	{
-		process.stdout.write ( "Authenticting " + post.username + "... ");
 		db.openSync ( "utf8" );
 		if ( db.checkFieldExists ( "users", post.username.trim() ) )	// if user exists
 		{
 			var user = db.getField ( "users", post.username );
 			if	( ( user.password === post.passwd ) && ( user.school === post.school ) )
 			{
-				process.stdout.write ( "Success! Credentials valid\n" );
 				return true;
 			}
 	}
-		process.stdout.write ( "Failure! Credentials invalid\n" );
 		return false; // if conditions are not met, return false
 	}
 
@@ -74,16 +71,43 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 		var user = db.getField( "users", req.session.user_id );
 		var school = db.getField( "schools", user.school );
 		var teacher = db.getField( "users", user.teacher );
-			res.render ( 'profile', {
+		res.render ( 'profile', {
+			user_id: req.session.user_id,
+			user: user,
+			targetUser: user,
+			school: school,
+			teacher: teacher,
+			status: status
+		});
+	});
+
+	app.get ( '/task/:task_id', auth, function ( req, res )
+	{
+		var status = req.session.status || undefined; req.session.status = undefined;
+		db.openSync( "utf8" );
+		var user = db.getField ( "users", req.session.user_id );
+		var school = db.getField ( "schools", user.school );
+		school.tasks = school.tasks || [];
+		var task = school.tasks[req.params.task_id];
+
+		if ( task !== undefined )
+		{
+			res.render ( 'tasks',
+			{
 				user_id: req.session.user_id,
 				user: user,
-				targetUser: user,
 				school: school,
-				teacher: teacher,
-				status: status
+				task: task,
+				status: req.session.status
 			});
+		} else {
+			req.session.status = alert.danger ( "Task " + req.params.task_id + " not found, please try again" );
+			res.writeHead ( "404" );
+			res.redirect ( '/' );
+		}
+
 	});
-	
+
 	app.get ( '/admin', auth, function ( req, res )
 	{
 		var status = req.session.status || undefined; req.session.status = undefined;
@@ -116,8 +140,14 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 			req.session.user_id = post.username;
 			req.session.status = alert.success ( "Successfully authenticated :-)" );
 			var user = db.getField ( "users", post.username )
-			console.log ( "	+",	user.name, "has signed in." );
-			res.redirect ( "/profile" ); // redirect to profile if valid
+			console.log ( "      +",	user.name, "has signed in." );
+			if ( user.valid ) // if password not set to be updated
+			{
+				res.redirect ( "/profile" ); // redirect to profile if valid
+			} else {
+				req.session.status = alert.info ( "Your password needs to be updated." );
+				res.redirect ( "/change_password" ); // else redirect to password change page
+			}
 
 		} else {
 			req.session.status = alert.danger ( "Couldn't sign you in. Please check credentials." );
@@ -191,11 +221,11 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 		if ( db.getField ( "users", req.session.user_id ) )
 		{
 			verifyPost ( req );
-
 			req.session.status = editUser ({
 				username: post.inputUsername,
 				fullname: post.inputFullName,
 				password: post.inputPassword,
+				valid: post.inputValid,
 				school: post.inputSchool,
 				access: post.inputAccess,
 				teacher: post.inputTeacher
@@ -217,9 +247,11 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 		}
 	});
 
-	function newUser ( username, fullname, password, school, access, teacher )
+	function newUser ( username, fullname, password, school, access, teacher, valid )
 	{
 		db.openSync ( "utf8" );
+		var message;
+		valid = ( valid == false || valid == "false" ) ? false : true;
 		if ( !db.checkFieldExists ( "users", username ) )
 		{
 			var name = fullname || "John Smith",
@@ -227,13 +259,14 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 					password = password || "password123",
 					school = school,
 					access = access || 1,
-					teacher = teacher;
+					teacher = teacher,
+					valid = valid || false;
 			if ( school && db.checkFieldExists ( "schools", school ) )
 			{
-				var user = new datatypes.User ( fullname, username, password, school, access, teacher );
+				var user = new datatypes.User ( fullname, username, password, school, access, teacher, valid );
 				db.createField ( "users", username, user );
 				db.saveAsync( "store.db", function(){} );
-				var message;
+				message = alert.success ( "Account created successfully!" );
 			} else {
 				message = alert.danger ( "School code not recognized. Please confirm with your teacher." );
 			}
@@ -248,7 +281,8 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 		db.openSync ( "utf8" );
 		if ( stuff.username == undefined ) { return alert.danger ( "No user specified! Aborting" ); } else { var user = db.getField ( "users", stuff.username ); }
 		if ( stuff.fullname !== undefined ) { user.name = stuff.fullname; }
-		if ( stuff.password !== undefined ) { user.passwd = stuff.password; }
+		if ( stuff.password !== undefined ) { user.password = stuff.password; }
+		if ( stuff.valid == "true" || stuff.valid == true ) { user.valid = true; } else { user.valid = false; }
 		if ( stuff.school !== undefined && db.checkFieldExists ( "schools", stuff.school ) ) { user.school = stuff.school; } else { alert.danger ( "School not found." ); }
 		if ( stuff.access !== undefined && !isNaN ( parseInt ( stuff.access ) ) ) { user.access = parseInt ( stuff.access ); } else { return alert.danger ( "Incorrect access level." ); }
 		if ( stuff.teacher !== undefined && db.checkFieldExists ( "users", stuff.teacher ) && ( db.getField ( "users", stuff.teacher ).access >= 3 || stuff.access >=3 ) ) { user.teacher = stuff.teacher; } else { return alert.danger ( "User/teacher listing not found." ); }
@@ -280,7 +314,7 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 		var post = req.body;
 		if ( post.inputPassword == post.inputPassword2 )
 		{
-			req.session.status = newUser ( post.inputUsername, post.inputFullName, post.inputPassword, post.inputSchool ) || alert.success("");
+			req.session.status = newUser ( post.inputUsername, post.inputFullName, post.inputPassword, post.inputSchool, false ) || alert.success("");
 			if ( req.session.status.type == "success" )
 			{
 				res.redirect ( "/" );
@@ -292,7 +326,7 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 			res.redirect ( "/register" );
 		}
 	});
-	
+
 	// administration
 	app.get ( '/admin/add_user', auth, function ( req, res )
 	{
@@ -306,8 +340,9 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 			var schools = {};
 			schools [ adminUser.school ] = db.getField ( "schools", adminUser.school );
 		}
+		console.log(req.url)
 		res.render ( "adduser.ejs", {
-			user_id: req.session.user_id,
+			user_id: req.session.user_id || "none",
 			user: adminUser,
 			users: db.getTable ( "users" ),
 			schools: schools,
@@ -318,12 +353,13 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 	function verifyPost ( req )
 	{
 		var post = req.body;
-		post.inputFullName	= ( post.inputFullName	== undefined	|| post.inputFullName.toString().trim() == "" )	? ( undefined ) : ( post.inputFullName );
-		post.inputUsername	= ( post.inputUsername	== undefined	|| post.inputUsername.toString().trim() == "" )	? ( undefined ) : ( post.inputUsername );
-		post.inputPassword	= ( post.inputPassword	== undefined	|| post.inputPassword.toString().trim() == "" )	? ( undefined ) : ( post.inputPassword );
-		post.inputSchool		= ( post.inputSchool		== undefined	|| post.inputSchool.toString().trim() == "" )		? ( undefined ) : ( post.inputSchool );
-		post.inputAccess		= ( post.inputAccess		== undefined	|| post.inputAccess.toString().trim() == "" )		? ( undefined ) : ( parseInt ( post.inputAccess ) );
-		post.inputTeacher	 	= ( post.inputTeacher		== undefined	|| post.inputTeacher.toString().trim() == "" )	? ( undefined ) : ( post.inputTeacher );	
+		post.inputFullName	= ( post.inputFullName	== undefined || post.inputFullName.toString().trim() == "" )	? ( undefined ) : ( post.inputFullName );
+		post.inputUsername	= ( post.inputUsername	== undefined || post.inputUsername.toString().trim() == "" )	? ( undefined ) : ( post.inputUsername );
+		post.inputPassword	= ( post.inputPassword	== undefined || post.inputPassword.toString().trim() == "" )	? ( undefined ) : ( post.inputPassword );
+		post.inputValid		= ( post.inputValid		== undefined )	? ( undefined ) : ( post.inputValid );
+		post.inputSchool	= ( post.inputSchool	== undefined || post.inputSchool.toString().trim() == "" )		? ( undefined ) : ( post.inputSchool );
+		post.inputAccess	= ( post.inputAccess	== undefined || post.inputAccess.toString().trim() == "" )		? ( undefined ) : ( parseInt ( post.inputAccess ) );
+		post.inputTeacher	= ( post.inputTeacher	== undefined || post.inputTeacher.toString().trim() == "" )	? ( undefined ) : ( post.inputTeacher );
 	}
 
 	app.post ( '/admin/add_user', auth, function ( req, res )
@@ -338,7 +374,8 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 			post.inputPassword,
 			post.inputSchool,
 			post.inputAccess,
-			post.inputTeacher
+			post.inputTeacher,
+			post.inputValid
 		);
 		res.redirect ( "/admin/add_user" );
 	});
@@ -390,6 +427,38 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 		res.redirect ( '/admin' );
 		//res.send ( req.params.user_id );
 	});
+
+	app.get ( '/change_password', auth, function ( req, res )
+	{
+		var status = req.session.status || undefined; req.session.status = undefined;
+		db.openSync ( "utf8" );
+		var user = db.getField( "users", req.session.user_id );
+		res.render ( 'changepassword', {
+			user_id: req.session.user_id,
+			user: user,
+			status: status
+		});
+	});
+
+	app.post ( '/change_password', function ( req, res )
+	{
+		db.openSync ( "utf8" );
+		var user = db.getField ( "users", req.session.user_id );
+		var post = req.body;
+		if ( post.inputCurrentPassword == user.password )
+		{
+			user.password = post.inputNewPassword;
+			user.valid = true;
+			console.log ( "User, " + user.username + ", changed their password." );
+			db.saveAsync ( "store.db", function (){} );
+			req.session.status = alert.success ( "Password successfully changed!" );
+			res.redirect ( "/" );
+		} else {
+			req.session.status = alert.danger ( "Supplied current password incorrect." );
+			res.redirect ( "/change_password" );
+		}
+	});
+
 
 	// Logs out ( deletes session data )
 	app.get ( '/logout', function ( req, res ) {

@@ -1,19 +1,19 @@
 <!DOCTYPE html>
 <html lang="en">
 	<head>
-    <% include partials/head %>
+		<% include partials/head %>
 		<link rel="stylesheet" href="/css/context.css">
 	</head>
 	<body class="container">
 
-    <header>
-        <% include partials/header %>
-    </header>
+		<header>
+				<% include partials/header %>
+		</header>
 
-    <main>
-        <div class="row">
+		<main>
+				<div class="row">
 					<% include partials/error %>
-          <div class="col-sm-12">
+					<div class="col-sm-12">
 					<% if ( user_id !== undefined ) { %>
 						<div class="panel panel-default">
 							<div class="panel-heading">
@@ -41,7 +41,7 @@
 							</div>
 						</div>
 					<% } %>
-            <div class="panel panel-default">
+						<div class="panel panel-default">
 							<div class="panel-heading">
 								<!--<button class="debug btn btn-success">Debug</button>-->
 								<% if ( user_id !== undefined ) { %>
@@ -51,17 +51,17 @@
 									<h3 class="panel-title">Sandbox</h3>
 								<% } %>
 							</div>
-              <div class="panel-body" style="padding:0;">
-                <div id="paper"></div>
-              </div>
-            </div>
-          </div>
-        </div>
-    </main>
+							<div class="panel-body" style="padding:0;">
+								<div id="paper"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+		</main>
 
-    <footer>
-        <% include partials/footer %>
-    </footer>
+		<footer>
+				<% include partials/footer %>
+		</footer>
 
 		<save>
 			<div class="modal fade" id="saveModal" aria-labelledby="saveModalTitle" tabindex="-1" role="dialog">
@@ -94,31 +94,31 @@
 
 		<load>
 			<div class="modal fade" id="loadModal" aria-labelledby="saveModalTitle" tabindex="-1" role="dialog">
-        <div class="modal-dialog">
-          <div class="modal-content">
-            <div class="modal-header">
-              <button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-              <h4 class="modal-title" id="saveModalTitle">Load File</h4>
-            </div>
-            <div class="modal-body">
-              <div class="form-group">
-                <label for="fileDesc">Description</label>
-                <textarea class="form-control" id="fileDesc" rows="5" laceholder="Description of file"></textarea>
-              </div>
-              <div class="form-group">
-                <label for="fileAuthor">Author</label>
-                <input type="text" class="form-control" id="fileAuthor" placeholder="John Doe">
-              </div>
-            </div>
-            <div class="modal-footer">
-              <div class="form-group col-sm-10">
-                <input type="text" class="form-control" id="filename" placeholder="filename.gates">
-              </div>
-              <button type="button" class="col-sm-2 btn btn-primary" id="saveButton">Save</button>
-            </div>
-          </div>
-        </div>
-      </div>
+				<div class="modal-dialog">
+					<div class="modal-content">
+						<div class="modal-header">
+							<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
+							<h4 class="modal-title" id="saveModalTitle">Load File</h4>
+						</div>
+						<div class="modal-body">
+							<div class="form-group">
+								<label for="fileDesc">Description</label>
+								<textarea class="form-control" id="fileDesc" rows="5" laceholder="Description of file"></textarea>
+							</div>
+							<div class="form-group">
+								<label for="fileAuthor">Author</label>
+								<input type="text" class="form-control" id="fileAuthor" placeholder="John Doe">
+							</div>
+						</div>
+						<div class="modal-footer">
+							<div class="form-group col-sm-10">
+								<input type="text" class="form-control" id="filename" placeholder="filename.gates">
+							</div>
+							<button type="button" class="col-sm-2 btn btn-primary" id="saveButton">Save</button>
+						</div>
+					</div>
+				</div>
+			</div>
 		</load>
 
 		<link rel="stylesheet" type="text/css" href="/css/joint.css" />
@@ -174,10 +174,10 @@
 			function refresh ()
 			{
 				graph.addCells ( _.toArray ( gates ) );
-        _.each ( wires, function ( attributes )
+				_.each ( wires, function ( attributes )
 				{
-          graph.addCell ( paper.getDefaultLink().set ( attributes ) );
-        });
+					graph.addCell ( paper.getDefaultLink().set ( attributes ) );
+				});
 			}
 
 			function saveToServer ( filename, desc, author )
@@ -202,12 +202,12 @@
 			}
 
 			function deleteFromServer ( filename )
-      {
-        if ( user !== undefined && user.username.toString().trim() !== "" )
-        {
-          socket.emit( 'delete_data', { user: { username: usr, password: pwd } , target: filename } );
-        }
-      }
+			{
+				if ( user !== undefined && user.username.toString().trim() !== "" )
+				{
+					socket.emit( 'delete_data', { user: { username: usr, password: pwd } , target: filename } );
+				}
+			}
 
 			socket.on ( 'load_data', function ( data )
 			{
@@ -274,10 +274,10 @@
 			});
 
 			$( ".deleteButton" ).click( function()
-      {
-        var file = $( this ).attr( "mork-data" );
-        deleteFromServer ( file );
-      });
+			{
+				var file = $( this ).attr( "mork-data" );
+				deleteFromServer ( file );
+			});
 
 			var alert = '<div class="alert alert-$type fade in out" id="$id" role="alert">$msg</div>';
 			function showAlert ( type, msg )
