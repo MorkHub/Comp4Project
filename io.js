@@ -12,7 +12,7 @@ module.exports = function ( app, db, io, host, crypto )
 		socket.on ( 'gate_data', function ( data ) {
 			socket.emit ( 'broadcast', "Thanks for the data!" );
 		});
-	
+
 		socket.on ( 'login', function ( data )
 		{
 			db.openSync ( "utf8" );
@@ -23,7 +23,7 @@ module.exports = function ( app, db, io, host, crypto )
 				var user = db.getField ( "users", usr );
 				if ( user.password === pwd )
 				{
-					console.log ( "      + " + user.name + " has signed in (sandbox)" ); 
+					console.log ( "      + " + user.name + " has signed in (sandbox)" );
 					socket.emit ( "login_response", { name: user.name, username: user.username } )
 				}
 			}
@@ -40,10 +40,11 @@ module.exports = function ( app, db, io, host, crypto )
 					console.log(data.saveData);
 					console.log ( "User, " + user.username + ", uploaded " + data.saveData.project.name + " \"" +  data.saveData.project.desc + "\" by " + data.saveData.project.author + "." );
 					db.set ( "users", data.user.username, user );
-				}
+					socket.emit( "save_response", true );
+				} else { socket.emit( "save_response", "Invalid user" ); }
 			});
 		});
-		
+
 		socket.on ( 'load_data', function ( data )
 		{
 			var user = data.user,

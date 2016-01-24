@@ -44,13 +44,41 @@ module.exports = {
       this.access
     );
     this.tasksDone = [];
-    this.score = this.name.length * 6;
-    this.grade = grade ( this.score, 100 );
+    this.score = function ()
+		{
+			var temp = { score: 0, max: 0  };
+			for ( key in this.tasksDone )
+			{
+				var task = this.tasksDone[key];
+				temp.score += task.score; temp.max += task.value;
+			}
+			this.grade = grade ( temp.score, temp.max );
+			return temp;
+		}
+    this.grade = "U";
     this.teacher = teacher || "rsanchez";
   }.bind(this),
+	Task: function ( name, desc, summary, level, value, teacher, solution )
+	{
+		this.name = name || "A Task";
+		this.desc = desc || "Description of a task";
+		this.summary = summary || "Task summary";
+		this.level = level || 1;
+		this.value = value || "0";
+		this.solution = solution || "none";
+		this.teacher = teacher || "all";
+	}.bind(this),
+	School: function ( id, name, shortname, logo )
+	{
+		this.id = id;
+		this.name = name;
+		this.shortName = short || name.split(" ").forEach ( function ( part ) { this.shortName += part.substring(0,1).toUpperCase(); } );
+		this.logo = "/media/schools/" + this.id + "/logo.png";
+		this.tasks = [];
+	}.bind(this),
 	RemoveUser : function ( username, school )
 	{
-		if ( school !== undefined ) 
+		if ( school !== undefined )
 		{
 			rmdir ( username, school )
 		}

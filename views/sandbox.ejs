@@ -75,7 +75,7 @@
 							<div class="form-group">
 								<label for="fileDesc">Description</label>
 								<textarea class="form-control" id="fileDesc" rows="5" laceholder="Description of file"></textarea>
-							</div>
+									</div>
 							<div class="form-group">
 								<label for="fileAuthor">Author</label>
 								<input type="text" class="form-control" id="fileAuthor" placeholder="John Doe">
@@ -119,7 +119,29 @@
 					</div>
 				</div>
 			</div>
-		</load>
+			</load>
+
+			<menu>
+				<nav class="context-menu">
+						<ul class="context-menu__items">
+								<li class="context-menu__item">
+										<a class="context-menu__link" id="context-menu__add" onclick="add()">
+												<i class="glyphicon glyphicon-plus"></i> Add item
+										</a>
+								</li>
+								<li class="context-menu__item">
+										<a class="context-menu__link" id="context-menu__duplicate" onclick="dup()">
+												<i class="glyphicon glyphicon-duplicate"></i> Duplicate item
+										</a>
+								</li>
+								<li class="context-menu__item">
+										<a class="context-menu__link" id="context-menu__delete" onclick="del()">
+												<i class="glyphicon glyphicon-trash"></i> Delete item
+										</a>
+								</li>
+						</ul>
+				</nav>
+			</menu>
 
 		<link rel="stylesheet" type="text/css" href="/css/joint.css" />
 		<script src="/js/lodash.min.js"></script>
@@ -160,15 +182,15 @@
 				if ( usr !== null && pwd !== null )
 				{	socket.emit ( "login", { usr: usr, pwd: pwd } ) }
 			});
-				socket.on ( 'broadcast', function ( data )
-				{
-					console.log ( data );
-				});
+			socket.on ( 'broadcast', function ( data )
+			{
+				console.log ( data );
+			});
 			socket.on ( 'login_response', function ( data )
 			{
 				user = data;
-				console.log ( "Username: " + user.username + "\nName: " + user.name );
-				files = data.files
+				files = data.files;
+				showAlert ( "success", "Successfully logged in! :-)" )
 			});
 
 			function refresh ()
@@ -192,6 +214,17 @@
 					};
 				return false;
 			}
+
+			socket.on ( 'save_response', function ( data )
+			{
+				if ( data == true ){
+					$('#saveModal').modal('hide');
+					showAlert("success", "Diagram saved to account! :-)");
+				} else {
+					$('#saveModal').modal('hide');
+					showAlert("danger", "Error: " + data);
+				}
+			});
 
 			function loadFromServer ( filename )
 			{
@@ -264,7 +297,6 @@
 
 			$( "#saveButton" ).click ( function()
 			{
-				console.log ( $( "#filename" ).val(), $( "#fileDesc " ).val(), $( "#fileAuthor" ).val() );
 				saveToServer ( $( "#filename" ).val(), $( "#fileDesc " ).val(), $( "#fileAuthor" ).val() );
 			});
 			$( ".loadButton" ).click( function()
@@ -286,7 +318,6 @@
 				$("#messageArea").append( alert.replace("$type",type).replace("$id",id).replace("$msg",msg) );
 				setTimeout( function(){$("#" + id).alert('close')}, 2000);
 			}
-			showAlert( "danger", "lol you bad" );
 		</script>
 	</body>
 </html>
