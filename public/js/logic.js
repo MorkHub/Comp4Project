@@ -124,31 +124,28 @@ joint.shapes.logic.Output.prototype.onSignal = function(signal) {
 }
 
 // diagramm setup
-
+var right = Math.floor( paper.svg.clientWidth / 1.5 ) - 100;
+var count = 0;
+function stack (){
+	count++;
+	return 15 + 50 * (count - 1);
+}
 var gates = gates || {
-    repeater: new joint.shapes.logic.Repeater({ position: { x: 410, y: 25 }}),
-    or: new joint.shapes.logic.Or({ position: { x: Math.floor( paper.svg.clientWidth / 1.5 ) - 100, y: 20 }}),
-    and: new joint.shapes.logic.And({ position: { x: Math.floor( paper.svg.clientWidth / 1.5 ) - 100, y: 70 }}),
-    not: new joint.shapes.logic.Not({ position: { x: 90, y: 140 }}),
-    nand: new joint.shapes.logic.Nand({ position: { x: Math.floor( paper.svg.clientWidth / 1.5 ) - 100, y: 120 }}),
-    nor: new joint.shapes.logic.Nor({ position: { x: 270, y: 190 }}),
-    xor: new joint.shapes.logic.Xor({ position: { x: Math.floor( paper.svg.clientWidth / 1.5 ) - 100, y: 170 }}),
-    xnor: new joint.shapes.logic.Xnor({ position: { x: Math.floor( paper.svg.clientWidth / 1.5 ) - 100, y: 220 }}),
-    on: new joint.shapes.logic.InputOn({ position: { x: 5, y: 45 }}),
-    off: new joint.shapes.logic.InputOff({ position: { x: 5, y: 90 }}),
-    output: new joint.shapes.logic.Output({ position: { x: 440, y: 290 }})
+    repeater: new joint.shapes.logic.Repeater({ position: { x: right, y: stack() }}),
+    or:       new joint.shapes.logic.Or      ({ position: { x: right, y: stack() }}),
+    and:      new joint.shapes.logic.And     ({ position: { x: right, y: stack() }}),
+    not:      new joint.shapes.logic.Not     ({ position: { x: right, y: stack() }}),
+    nand:     new joint.shapes.logic.Nand    ({ position: { x: right, y: stack() }}),
+    nor:      new joint.shapes.logic.Nor     ({ position: { x: right, y: stack() }}),
+    xor:      new joint.shapes.logic.Xor     ({ position: { x: right, y: stack() }}),
+    xnor:     new joint.shapes.logic.Xnor    ({ position: { x: right, y: stack() }}),
+    on:       new joint.shapes.logic.InputOn ({ position: { x: right, y: stack() }}),
+    off:      new joint.shapes.logic.InputOff({ position: { x: right, y: stack() }}),
+    output:   new joint.shapes.logic.Output  ({ position: { x: right, y: stack() }})
 };
 
 
-var wires = wires || [
-    { source: { id: gates.on.id, port: 'out' }, target: { id: gates.not.id, port: 'in' }},
-    { source: { id: gates.not.id, port: 'out' }, target: { id: gates.nor.id, port: 'in1' }},
-    { source: { id: gates.nor.id, port: 'out' }, target: { id: gates.repeater.id, port: 'in' }},
-    { source: { id: gates.nor.id, port: 'out' }, target: { id: gates.output.id, port: 'in' }},
-    { source: { id: gates.repeater.id, port: 'out' }, target: { id: gates.nor.id, port: 'in2'},
-      vertices: [{ x: 215, y: 100 }]
-    }
-];
+var wires = wires || [];
 
 // add gates and wires to the graph
 graph.addCells(_.toArray(gates));

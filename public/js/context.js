@@ -45,21 +45,7 @@ function del()
 var menu = document.querySelector(".context-menu");
 var menuState = 0;
 var active = "context-menu--active";
-var offsetPos = { x: 0, y: 0 };
 
-var offsetPos = { x:0, y:0  };
-/*var el = $( "#paper"  );
-while ( !el.is("html") ) {
-		console.log(el);
-		el = el.parent();
-		a = el.position();
-		offsetPos.x += a.left;
-		offsetPos.y += a.top;
-}*/
-
-var menuPosition;
-var menuPositionX;
-var menuPositionY;
 var cellView;
 
 function toggleMenuOn ( c, t ) {
@@ -84,7 +70,6 @@ function toggleMenuOn ( c, t ) {
 		}
 	} else { toggleMenuOff(); toggleMenuOn ( c, t ); }
 }
-
 function toggleMenuOff () {
 	if ( menuState !== 0 ) {
 		cellView = undefined;
@@ -104,7 +89,6 @@ paper.on('cell:pointerdown', function( cellView, evt, x, y )
 			if ( cellView.model.attributes.type.substring( "logic.Input" ) !== -1 )
 			{
 				var id = cellView.model.id;
-
 				_.each( graph.getCells(), function ( cell )
 				{
 					if ( true ) {}
@@ -123,32 +107,23 @@ paper.on('cell:pointerdown', function( cellView, evt, x, y )
 			}
 			toggleMenuOff();
 		break;
-
 		case 2:
 			var type = cellView.model.attributes.type || "none";
 			toggleMenuOn(cellView, type);
-
-			menuPosition = { x: $(cellView.el).position().left, y: $(cellView.el).position().top };
-			menuPositionX = menuPosition.x + "px";
-			menuPositionY = menuPosition.y + "px";
-			menu.style.left = menuPositionX;
-			menu.style.top = menuPositionY;
+			menu.style.left = 265 + x*1.5 + "px";
+			menu.style.top = 73 + y*1.5 + "px";
 		break;
 	}
 });
-
 paper.on( "blank:pointerdown", function ( evt, x, y)
 {
 	if ( evt.button == 2 )
 	{
 		toggleMenuOn(cellView, "paper");
-
-		menuPosition = { x: x, y: y };
-		menuPositionX = offsetPos.x + menuPosition.x + "px";
-		menuPositionY = offsetPos.y + menuPosition.y + "px";
-		menu.style.left = menuPositionX;
-		menu.style.top = menuPositionY;
+		menu.style.left = 240 + x*1.5 + "px";
+		menu.style.top = 73 + y*1.5 + "px";
 	} else {
 		toggleMenuOff();
 	}
 });
+document.addEventListener( "contextmenu", function(e) { if ( menuState == 1 ) { e.preventDefault() } } )
