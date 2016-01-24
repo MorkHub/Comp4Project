@@ -15,17 +15,6 @@ var session    = require ( "express-session" ),
 // database init
 var db = flat ( "store.db", { persist: true } );
 
-db.openAsync("utf8", function () {
-	var schools = db.getTable("schools");
-	console.log(schools)
-	for ( key in schools )
-	{
-		schools[key].tasks = [];
-		console.log(schools[key])
-		db.set("schools",key,schools[key]);
-	}
-});
-
 // Enable modules & init
 app.set ( 'view engine', 'ejs' ); // view engine; used to render pages, with data passed to html
 app.use ( bodyParser.json () ); //  bodyParser allows me to receive data from post body
