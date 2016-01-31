@@ -287,7 +287,7 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 		if ( stuff.access !== undefined && !isNaN ( parseInt ( stuff.access ) ) ) { user.access = parseInt ( stuff.access ); } else { return alert.danger ( "Incorrect access level." ); }
 		if ( stuff.teacher !== undefined && db.checkFieldExists ( "users", stuff.teacher ) && ( db.getField ( "users", stuff.teacher ).access >= 3 || stuff.access >=3 ) ) { user.teacher = stuff.teacher; } else { return alert.danger ( "User/teacher listing not found." ); }
 
-		db.saveAsync ( "utf8", function(){} );
+		db.saveAsync ( "store.db", function(){} );
 		if ( db.checkFieldExists ( "users", stuff.username ) )
 		{
 			var message;
