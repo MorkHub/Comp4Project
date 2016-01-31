@@ -44,20 +44,11 @@ module.exports = {
       this.access
     );
     this.tasksDone = [];
-    this.score = function ()
-		{
-			var temp = { score: 0, max: 0  };
-			for ( key in this.tasksDone )
-			{
-				var task = this.tasksDone[key];
-				temp.score += task.score; temp.max += task.value;
-			}
-			this.grade = grade ( temp.score, temp.max );
-			return temp;
-		}
+    this.score = 0;
     this.grade = "U";
     this.teacher = teacher || "rsanchez";
   }.bind(this),
+	userScore: Score,
 	Task: function ( name, desc, summary, level, value, teacher, solution )
 	{
 		this.name = name || "A Task";
@@ -106,4 +97,16 @@ function grade ( score, max )
 		"A*"
 	];
 	return grades [ index ] || "U"; // Defaults to 'U' if still fails
+}
+function Score ( user )
+{
+	var temp = { score: 0, max: 0  };
+	for ( key in this.tasksDone )
+	{
+		var task = this.tasksDone[key];
+		temp.score += task.score; temp.max += task.value;
+	}
+	if ( tasksDone.length <1  ) { temp.score = 0; temp.max = 0; }
+	this.grade = grade ( temp.score, temp.max );
+	return temp;
 }
