@@ -251,16 +251,16 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 	{
 		db.openSync ( "utf8" );
 		var message;
-		valid = ( valid == false || valid == "false" ) ? false : true;
-		if ( !db.checkFieldExists ( "users", username ) )
-		{
 			var name = fullname || "John Smith",
-					username = username || ( fullname.substring ( 0,1 ) + fullname.substring ( fullname.indexOf( " " ) ) ).toLowerCase(),
+					username = username || ( fullname.substring ( 0,1 ) + fullname.substring ( fullname.indexOf( " " ) +1 ) ).toLowerCase(),
 					password = password || "password123",
 					school = school,
 					access = access || 1,
 					teacher = teacher,
 					valid = valid || false;
+		valid = ( valid == false || valid == "false" ) ? false : true;
+		if ( !db.checkFieldExists ( "users", username ) )
+		{
 			if ( school && db.checkFieldExists ( "schools", school ) )
 			{
 				var user = new datatypes.User ( fullname, username, password, school, access, teacher, valid );
@@ -354,7 +354,7 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 	{
 		var post = req.body;
 		post.inputFullName	= ( post.inputFullName	== undefined || post.inputFullName.toString().trim() == "" )	? ( undefined ) : ( post.inputFullName );
-		post.inputUsername	= ( post.inputUsername	== undefined || post.inputUsername.toString().trim() == "" )	? ( undefined ) : ( post.inputUsername );
+		post.inputUsername	= ( post.inputUsername	== undefined || post.inputUsername.toString().trim() == "" )	? ( undefined ) : ( post.inputUsername.replace(".","") );
 		post.inputPassword	= ( post.inputPassword	== undefined || post.inputPassword.toString().trim() == "" )	? ( undefined ) : ( post.inputPassword );
 		post.inputValid		= ( post.inputValid		== undefined )	? ( undefined ) : ( post.inputValid );
 		post.inputSchool	= ( post.inputSchool	== undefined || post.inputSchool.toString().trim() == "" )		? ( undefined ) : ( post.inputSchool );
