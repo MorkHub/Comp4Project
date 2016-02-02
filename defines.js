@@ -1,6 +1,6 @@
 var md5		= require ( "md5" );
 var exec	= require ( "child_process" ).exec;
-var dir 	= "/home/mork/project/public/media/schools"
+var dir		= "/home/mork/project/public/media/schools"
 function mkdir ( user, school )
 {
 	if ( school !== undefined )
@@ -21,33 +21,33 @@ function rmdir ( user, school )
 }
 
 module.exports = {
-  User : function ( name, username, password, school, access, teacher, valid, avatar )
-  {
-    this.id;
-    this.name = name || "John Smith";
-    // this.email = email || "jsmith@mail.com";
-    this.username = username;
-    this.password = password || "password123";
+	User : function ( name, username, password, school, access, teacher, valid, avatar )
+	{
+		this.id;
+		this.name = name || "John Smith";
+		// this.email = email || "jsmith@mail.com";
+		this.username = username;
+		this.password = password || "password123";
 		this.valid = valid || false;
-    this.school = school || "";
-    this.access = parseInt ( access ) || 1;
-    if ( avatar )
+		this.school = school || "";
+		this.access = parseInt ( access ) || 1;
+		if ( avatar )
 		{
 			this.avatar = avatar.replace (/ /g, "%20" ) } else { this.avatar = "/media/schools/" + this.school + "/users/" + this.username + "/avatar.png";
 			mkdir ( username, school );
 		};
-    this.id = md5 (
-      this.name.replace ( / /g, "" ) +
-      this.email +
-      this.password +
-      this.school +
-      this.access
-    );
-    this.tasksDone = [];
-    this.score = 0;
-    this.grade = "U";
-    this.teacher = teacher || "rsanchez";
-  }.bind(this),
+		this.id = md5 (
+			this.name.replace ( / /g, "" ) +
+			this.email +
+			this.password +
+			this.school +
+			this.access
+		);
+		this.tasksDone = [];
+		this.score = 0;
+		this.grade = "U";
+		this.teacher = teacher || "rsanchez";
+	}.bind(this),
 	userScore: Score,
 	Task: function ( name, desc, summary, level, value, teacher, solution )
 	{
@@ -65,7 +65,6 @@ module.exports = {
 		this.name = name;
 		this.shortName = short || name.split(" ").forEach ( function ( part ) { this.shortName += part.substring(0,1).toUpperCase(); } );
 		this.logo = "/media/schools/" + this.id + "/logo.png";
-		this.tasks = [];
 	}.bind(this),
 	RemoveUser : function ( username, school )
 	{
@@ -106,7 +105,7 @@ function Score ( user )
 		var task = this.tasksDone[key];
 		temp.score += task.score; temp.max += task.value;
 	}
-	if ( tasksDone.length <1  ) { temp.score = 0; temp.max = 0; }
+	if ( tasksDone.length <1	) { temp.score = 0; temp.max = 0; }
 	this.grade = grade ( temp.score, temp.max );
 	return temp;
 }
