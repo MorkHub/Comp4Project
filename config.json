@@ -1,0 +1,9 @@
+{
+	"name": "LogicSim",
+	"script": "app.js",
+	"watch": true,
+	"ignore_watch": [
+		"store\.db",
+		"node_modules"
+	]
+}
