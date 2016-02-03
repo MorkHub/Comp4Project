@@ -1,12 +1,4 @@
 // Extend joint logic
-/*
-.element .body {
-    fill: #68DDD5;
-    stroke: #44CCC3;
-    stroke-opacity: 0.5;
-    transition: all 0.2s;
-}
-*/
 joint.shapes.logic.InputOn = joint.shapes.logic.IO.extend({
   defaults: joint.util.deepSupplement({
     type: 'logic.InputOn',
