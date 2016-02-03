@@ -117,13 +117,6 @@ paper.on('cell:pointerdown', function( cellView, evt, x, y )
 });
 paper.on( "blank:pointerdown", function ( evt, x, y)
 {
-	if ( evt.button == 2 )
-	{
-		toggleMenuOn(cellView, "paper");
-		menu.style.left = 240 + x*1.5 + "px";
-		menu.style.top = 73 + y*1.5 + "px";
-	} else {
-		toggleMenuOff();
-	}
+	toggleMenuOff();
 });
 document.addEventListener( "contextmenu", function(e) { if ( menuState == 1 ) { e.preventDefault() } } )
