@@ -23,7 +23,7 @@ module.exports = function ( app, db, io, host, crypto )
 				var user = db.getField ( "users", usr );
 				if ( user.password === pwd )
 				{
-					console.log ( "      + " + user.name + " has signed in (sandbox)" );
+					console.log ( "      +  " + user.name + " has signed in (sandbox)" );
 					socket.emit ( "login_response", { name: user.name, username: user.username } )
 				}
 			}
@@ -37,8 +37,8 @@ module.exports = function ( app, db, io, host, crypto )
 					var user = db.getField ( "users", data.user.username );
 					user.files = user.files || {};
 					user.files [ data.saveData.project.name ] = data.saveData;
-					console.log(data.saveData);
-					console.log ( "User, " + user.username + ", uploaded " + data.saveData.project.name + " \"" +  data.saveData.project.desc + "\" by " + data.saveData.project.author + "." );
+					// console.log(data.saveData);
+					console.log ( "      -> " + user.username + ", uploaded \"" + data.saveData.project.name + "\" by \"" + data.saveData.project.author + "\"." );
 					db.set ( "users", data.user.username, user );
 					socket.emit( "save_response", true );
 				} else { socket.emit( "save_response", "Invalid user" ); }
@@ -59,7 +59,7 @@ module.exports = function ( app, db, io, host, crypto )
 					var saveData = userObj.files[target] || { gates: {}, wires: {}, project: { name: "", desc: "",author: "" } };
 					if ( user.password = userObj.password && saveData.project.name.trim() !== "" )
 					{
-						console.log ( "User, " + user.username + ", loaded project " + saveData.project.name + " \"" + saveData.project.desc + "\" by " + saveData.project.author + "." );
+						console.log ( "      <- " + user.username + ", downloaded \"" + saveData.project.name + "\" by \"" + saveData.project.author + "\"." );
 						socket.emit ( "load_data", saveData);
 					} else { socket.emit ( 'delete_error', { type: "danger", title: "Delete error", msg: "Password incorrect." } ); }
 				} else { socket.emit ( 'load_error', { type: "danger", title: "Load error", msg: "User not found." } ); }
@@ -82,7 +82,7 @@ module.exports = function ( app, db, io, host, crypto )
 						userObj.files = userObj.files || {};
 						delete userObj.files[target];
 						db.set ( "users", user.username, userObj );
-            console.log ( "User, " + user.username + ", deleted project " + target + "." );
+            console.log ( "      xx " + user.username + " deleted " + target );
           } else { socket.emit ( 'delete_error', { type: "danger", title: "Delete error", msg: "Password incorrect." } ); }
         } else { socket.emit ( 'load_error', { type: "danger", title: "Load error", msg: "User not found." } ); }
       });
