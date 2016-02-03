@@ -1,6 +1,6 @@
 module.exports = function ( express, app, db, ejs, datatypes, crypto )
 {
-	// Helper Functions ==========================================================
+	// section utility =====================================================================
 	var alert = {
 		success: function ( message ) { return { type: "success", title: "Success!", msg: message }; },
 		info: function ( message ) { return { type: "info", title: "Info:", msg: message }; },
@@ -10,6 +10,7 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 
 	var testUser = { name: "null", school: "NRSIN15",	}
 
+	// section auth ========================================================================
 	// Prevents page being rendered if user is not signed in, and page requires valid user
 	function auth ( req, res, next )
 	{
@@ -32,11 +33,11 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 			{
 				return true;
 			}
-	}
+		}
 		return false; // if conditions are not met, return false
 	}
 
-	// Routes ====================================================================
+	// section routes =======================================================================
 	app.get ( '/', function ( req, res )
 	{
 		db.openSync ( 'utf8' );
@@ -51,6 +52,7 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 		}); // render page, passing data to ejs template
 	});
 
+	// section sandbox
 	app.get ( '/sandbox', function ( req, res )
 	{
 		var status = req.session.status; req.session.status = undefined;
@@ -64,6 +66,7 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 		res.render ( 'sandbox', { print: { name: crypto.encrypt( user.username ), password: crypto.encrypt( user.password )}, access: access || 0, user_id: req.session.user_id, user: user, status: status, tasks: tasks } );
 	});
 
+	// section profile
 	app.get ( '/profile', auth, function ( req, res )
 	{
 		var status = req.session.status || undefined; req.session.status = undefined;
@@ -81,6 +84,7 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 		});
 	});
 
+	// section task
 	app.get ( '/task/:task_id', auth, function ( req, res )
 	{
 		var status = req.session.status || undefined; req.session.status = undefined;
@@ -108,6 +112,7 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 
 	});
 
+	// section admin
 	app.get ( '/admin', auth, function ( req, res )
 	{
 		var status = req.session.status || undefined; req.session.status = undefined;
@@ -129,31 +134,32 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 		}
 	});
 
-	app.post ( '/login', function ( req, res )
-	{
-		var post = req.body; // Get POST data
-		req.session.user_id = undefined; // Init user_id in session
-		var valid = validUser ( post ); // check if user is valid
-		if ( valid )
-		{
-			db.openSync ( "utf8" );
-			req.session.user_id = post.username;
-			req.session.status = alert.success ( "Successfully authenticated :-)" );
-			var user = db.getField ( "users", post.username )
-			console.log ( "      +",	user.name, "has signed in." );
-			if ( user.valid ) // if password not set to be updated
-			{
-				res.redirect ( "/profile" ); // redirect to profile if valid
-			} else {
-				req.session.status = alert.info ( "Your password needs to be updated." );
-				res.redirect ( "/change_password" ); // else redirect to password change page
-			}
 
-		} else {
-			req.session.status = alert.danger ( "Couldn't sign you in. Please check credentials." );
-			res.redirect ( "/" ); // redirect to home if invalid
-		}
-	});
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	app.get( '/school/:school_id', function ( req, res )
 	{
@@ -380,6 +386,7 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 		res.redirect ( "/admin/add_user" );
 	});
 
+	// section admin user
 	app.post ( '/admin/edit_user', auth, function ( req, res )
 	{
 		db.openSync ( "utf8" );
@@ -397,6 +404,7 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 		res.redirect ( "/admin/add_user" );
 	});
 
+	// section delete user
 	app.get ( '/delete_user/:user_id', auth, function ( req, res ) {
 		db.openSync( "utf8" );
 		//if ( !( req.session.user_id !== null && db.checkFieldExists ( "users", req.session.user_id ) ) )
@@ -459,12 +467,39 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 		}
 	});
 
+	// section login
+	app.post ( '/login', function ( req, res )
+	{
+		var post = req.body; // Get POST data
+		req.session.user_id = undefined; // Init user_id in session
+		var valid = validUser ( post ); // check if user is valid
+		if ( valid )
+		{
+			db.openSync ( "utf8" );
+			req.session.user_id = post.username;
+			req.session.status = alert.success ( "Successfully authenticated :-)" );
+			var user = db.getField ( "users", post.username )
+			console.log ( "      + ",	user.name, "has signed in." );
+			if ( user.valid ) // if password not set to be updated
+			{
+				res.redirect ( "/profile" ); // redirect to profile if valid
+			} else {
+				req.session.status = alert.info ( "Your password needs to be updated." );
+				res.redirect ( "/change_password" ); // else redirect to password change page
+			}
 
-	// Logs out ( deletes session data )
+		} else {
+			req.session.status = alert.danger ( "Couldn't sign you in. Please check credentials." );
+			res.redirect ( "/" ); // redirect to home if invalid
+		}
+	});
+
+
+	// section logout
 	app.get ( '/logout', function ( req, res ) {
 		db.openSync ( "utf8" );
 		var user = db.getField ( "users", req.session.user_id );
-		try { console.log ( "	-", ( user.name || null ), "has signed out." ) } catch (e) { }
+		try { console.log ( "    - ", ( user.name || null ), "has signed out." ) } catch (e) { }
 		req.session.user_id = undefined;
 		req.session.status = alert.info ( "Logged out. See you again soon." );
 		res.redirect ( "/" );
