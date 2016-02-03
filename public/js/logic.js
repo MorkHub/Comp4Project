@@ -1,3 +1,8 @@
+// Google Chrome version 48 removed support for SVGElement.getTransformToElement, reimplementing
+SVGElement.prototype.getTransformToElement = SVGElement.prototype.getTransformToElement || function(elem) {
+    return elem.getScreenCTM().inverse().multiply(this.getScreenCTM());
+};
+
 // Extend joint logic
 joint.shapes.logic.InputOn = joint.shapes.logic.IO.extend({
   defaults: joint.util.deepSupplement({
