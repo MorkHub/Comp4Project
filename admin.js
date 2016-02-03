@@ -34,7 +34,7 @@ if ( cmd.length > 1 ){
 							teacher = params[5] || e(usage),
 							valid = params[6] || false,
 							avatar = params[7] || undefined;
-					var user = new def.User ( name, username, password, school, access, teacher, false, avatar );
+					var user = new def.User ( name, username, password, school, access, teacher, school, false, avatar );
 					db.createField( "users", username, user );
 					db.saveAsync( "store.db", function(){} );
 				} else { e(usage); }
@@ -71,14 +71,21 @@ if ( cmd.length > 1 ){
 						level = params[3] || e(usage), level = ( !isNaN( parseInt( level ) ) ) ? ( parseInt( level ) ) : ( l.indexOf( level ) + 1 ), level = Math.max( 1, Math.min( level, 4 ) ),
 						value = params[4] || e(usage), value = ( !isNaN( parseInt( value ) ) ) ? ( parseInt( value ) ) : ( level * 10 ),
 						teacher = params[5] || e(usage),
+						school = db.getField( "schools", db.getField( "users", teacher ).school ).id,
 						solution = params[6] || "ANY";
-				var task = new def.Task ( name, desc, summary, level, value, teacher, solution  );
+				( school == undefined ) ? e(usage) : true;
+				var task = new def.Task ( name, desc, summary, level, value, teacher, school, solution  );
 				console.log( task );
-				//db.createField( "tasks", name.toLowerCase().replace(/ /g,""), task );
-				//db.saveAsync( "store.db", function(){} );
+				db.createField( "tasks", name.toLowerCase().replace(/ /g,""), task );
+				db.saveAsync( "store.db", function(){} );
 			} else { console.log( "Task exists") }	
 		break;
 		case "deltask":
+			if ( db.checkFieldExists( "tasks", params[0] ) ){
+				db.delete( "tasks", params[0] );
+			} else {
+				console.log( "Task does not exist" );
+			}
 		break;
 		case "showtask":
 			( db.checkFieldExists( "tasks", params[0] ) ) ? ( console.log( db.getField( "tasks", params[0] ) ) ) : e(usage);
