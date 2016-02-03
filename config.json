@@ -4,6 +4,7 @@
 	"watch": true,
 	"ignore_watch": [
 		"store\.db",
-		"node_modules"
+		"node_modules",
+		"public"
 	]
 }
