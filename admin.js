@@ -23,7 +23,7 @@ function e ( msg ){
 if ( cmd.length > 1 ){
 	switch ( cmd ){
 		case "adduser":
-			var usage = "USAGE: %s adduser <name> <username> <password> <school> <access> <teacher> [valid] [avatarURL]";
+			var usage = "USAGE: %s adduser <name> <username> <email> <password> <school> <access> <teacher> [valid] [avatarURL]";
 			if ( !db.checkFieldExists( "users", params[0] ) ) {
 				if ( params.length > 0 ){
 					var name = params[0] || e(usage),
@@ -48,7 +48,7 @@ if ( cmd.length > 1 ){
 		break;
 
 		case "list":
-			( db.checkTableExists( "users" ) ) ? ( console.log ( db.getTable( "users" ) ) ) : ( console.log( "No database" ) );
+			( db.checkTableExists( params[0] ) ) ? ( console.log ( db.getTable( params[0] ) ) ) : ( console.log( "No database" ) );
 		break;
 
 		case "addschool":
@@ -63,12 +63,11 @@ if ( cmd.length > 1 ){
 		case "addtask":
 			var usage = "USAGE: %s addtask <name> <desc|NONE> <summary> <BEGINNER|INTERMEDIATE|ADEPT|ELITE> <maximum points|DEFAULT> <teacher username> [solution] ";
 			var l = ["beginner","intermediate","adept","elite"];
-			console.log( params );
 			if ( !db.checkFieldExists( "tasks", ( params[0] || "" ).toLowerCase().replace(/ /g,"") ) ) {
 				var name = params[0] || e(usage),
 						desc = ( params[1] || e(usage) ) == "NONE" ? "" : params[1],
 						summary = params[2] || e(usage),
-						level = params[3] || e(usage), level = ( !isNaN( parseInt( level ) ) ) ? ( parseInt( level ) ) : ( l.indexOf( level ) + 1 ), level = Math.max( 1, Math.min( level, 4 ) ),
+						level = params[3] || e(usage), level = ( !isNaN( parseInt( level ) ) ) ? ( parseInt( level ) ) : ( l.indexOf( level.toLowerCase() ) + 1 ), level = Math.max( 1, Math.min( level, 4 ) ),
 						value = params[4] || e(usage), value = ( !isNaN( parseInt( value ) ) ) ? ( parseInt( value ) ) : ( level * 10 ),
 						teacher = params[5] || e(usage),
 						school = db.getField( "schools", db.getField( "users", teacher ).school ).id,
