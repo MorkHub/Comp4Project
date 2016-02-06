@@ -1,9 +1,5 @@
 module.exports = function ( app, db, io, host, crypto )
 {
-	db.openAsync ( "utf8", function ()
-	{
-		db.createTable ( "circuits" );
-	});
 	// client-server communication
 	io.on('connection', function ( socket )
 	{
