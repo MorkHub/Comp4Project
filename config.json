@@ -1,10 +1,11 @@
 {
 	"name": "logic",
 	"script": "app.js",
-	"watch": true,
-	"ignore_watch": [
-		"store\.db",
-		"node_modules",
-		"public"
-	]
+	"watch": [
+		"app.js",
+		"routes.js",
+		"io.js",
+		"defines.js",
+		"crypto.js"
+	],
 }
