@@ -1,41 +1,17 @@
 var md5		= require ( "md5" );
 var exec	= require ( "child_process" ).exec;
 var dir		= "/home/mork/project/public/media/schools"
-function mkdir ( user, school )
-{
-	if ( school !== undefined )
-	{
-		exec ( "mkdir " + dir + "/" + school + "/users/" + user + "; cp " + dir + "/default/* " + dir + "/" + school + "/users/" + user + "/", function ( error, stdout, stderr ) { if ( error ) { console.log ( "ERROR: " + error ) } } );
-	} else {
-		console.log ( "ERROR: Parameters missing ( usage: mkdir ( username, school )" );
-	}
-}
-function rmdir ( user, school )
-{
-	if ( school !== undefined )
-	{
-		exec ( "rm " + dir + "/" + school + "/users/" + user + "/* -r; rmdir " + dir + "/" + school + "/users/" + user, function ( error, stdout, stderr ) { if ( error ) { console.log ( "ERROR: " + error ) } } )
-	} else {
-		console.log ( "ERROR: Parameters missing ( usage: rmdir ( username, school )" );
-	}
-}
-
 module.exports = {
-	User : function ( name, username, password, school, access, teacher, valid, avatar )
+	User : function ( name, username, email, password, school, access, teacher, valid, avatar )
 	{
 		this.id;
 		this.name = name || "John Smith";
-		// this.email = email || "jsmith@mail.com";
 		this.username = username;
 		this.password = password || "password123";
 		this.valid = valid || false;
-		this.school = school || "";
+		this.school = school || "SCH1";
+		this.email = email || username + "@" + school.toLowerCase().replace(/ /g,"") + ".edu";
 		this.access = parseInt ( access ) || 1;
-		if ( avatar )
-		{
-			this.avatar = avatar.replace (/ /g, "%20" ) } else { this.avatar = "/media/schools/" + this.school + "/users/" + this.username + "/avatar.png";
-			mkdir ( username, school );
-		};
 		this.id = md5 (
 			this.name.replace ( / /g, "" ) +
 			this.email +
@@ -59,6 +35,7 @@ module.exports = {
 		this.solution = solution || "none";
 		this.teacher = teacher || "all";
 		this.school = school;
+		this.submissions = {};
 	}.bind(this),
 	School: function ( id, name, shortname, logo )
 	{
@@ -67,13 +44,6 @@ module.exports = {
 		this.shortName = short || name.split(" ").forEach ( function ( part ) { this.shortName += part.substring(0,1).toUpperCase(); } );
 		this.logo = "/media/schools/" + this.id + "/logo.png";
 	}.bind(this),
-	RemoveUser : function ( username, school )
-	{
-		if ( school !== undefined )
-		{
-			rmdir ( username, school )
-		}
-	},
 	grade: grade
 }
 
