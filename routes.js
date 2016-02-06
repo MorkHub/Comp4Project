@@ -157,6 +157,27 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 		});
 	});
 
+	// section task list
+	app.get ( '/tasks/', auth, function ( req, res )
+	{
+		var status = req.session.status || undefined; req.session.status = undefined;
+		db.openSync( "utf8" );
+		var user = db.getField ( "users", req.session.user_id );
+		var school = db.getField ( "users", req.session.user_id );
+		var tasks = [];
+		var temp = db.getTable( "tasks" )
+		for ( key in temp ){
+			if ( temp[key].teacher == user.teacher ) temp.push ( temp[key} )
+		}
+		res.render( 'tasklist/student', {
+			user_id: req.session.user_id,
+			user: user,
+			school: school,
+			tasks: tasks,
+			status: status
+		})
+	}
+
 	// section view task
 	app.get ( '/task/:task_id', auth, function ( req, res )
 	{
@@ -164,8 +185,7 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 		db.openSync( "utf8" );
 		var user = db.getField ( "users", req.session.user_id );
 		var school = db.getField ( "schools", user.school );
-		school.tasks = school.tasks || [];
-		var task = school.tasks[req.params.task_id];
+		var task = db.getField ( "tasks", req.params.task_id );
 
 		if ( task !== undefined )
 		{
@@ -175,7 +195,7 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 				user: user,
 				school: school,
 				task: task,
-				status: req.session.status
+				status: status
 			});
 		} else {
 			req.session.status = alert.danger ( "Task " + req.params.task_id + " not found, please try again" );

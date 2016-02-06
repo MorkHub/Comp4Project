@@ -49,7 +49,7 @@ module.exports = {
 		this.teacher = teacher || "rsanchez";
 	}.bind(this),
 	userScore: Score,
-	Task: function ( name, desc, summary, level, value, teacher, solution )
+	Task: function ( name, desc, summary, level, value, teacher, school, solution )
 	{
 		this.name = name || "A Task";
 		this.desc = desc || "Description of a task";
@@ -58,6 +58,7 @@ module.exports = {
 		this.value = value || "0";
 		this.solution = solution || "none";
 		this.teacher = teacher || "all";
+		this.school = school 
 	}.bind(this),
 	School: function ( id, name, shortname, logo )
 	{
