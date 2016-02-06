@@ -58,7 +58,7 @@ module.exports = {
 		this.value = value || "0";
 		this.solution = solution || "none";
 		this.teacher = teacher || "all";
-		this.school = school 
+		this.school = school;
 	}.bind(this),
 	School: function ( id, name, shortname, logo )
 	{
