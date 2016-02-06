@@ -1,4 +1,4 @@
-module.exports = function ( express, app, db, ejs, datatypes, crypto )
+module.exports = function ( express,app, db, ejs, datatypes, crypto )
 {
 	// section utility =====================================================================
 	var alert = {
@@ -8,7 +8,7 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 		danger: function ( message ) { return { type: "danger", title: "Oh Snap!", msg: message }; }
 	}
 
-	var testUser = { name: "null", school: "NRSIN15",	}
+	var testUser = { name: "null", school: "NRSIN15" };
 	function newUser ( username, fullname, password, school, access, teacher, valid )
 	{
 		db.openSync ( "utf8" );
@@ -167,7 +167,7 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 		var tasks = [];
 		var temp = db.getTable( "tasks" )
 		for ( key in temp ){
-			if ( temp[key].teacher == user.teacher ) temp.push ( temp[key} )
+			if ( temp[key].teacher == user.teacher ) temp.push ( temp[key] )
 		}
 		res.render( 'tasklist/student', {
 			user_id: req.session.user_id,
@@ -176,7 +176,7 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 			tasks: tasks,
 			status: status
 		})
-	}
+	});
 
 	// section view task
 	app.get ( '/task/:task_id', auth, function ( req, res )
@@ -202,7 +202,6 @@ module.exports = function ( express, app, db, ejs, datatypes, crypto )
 			res.writeHead ( "404" );
 			res.redirect ( '/' );
 		}
-
 	});
 
 	// section view school
