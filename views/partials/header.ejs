@@ -11,6 +11,7 @@
             <li><a href="/sandbox">Sandbox</a></li>
             <% if ( user_id !== undefined ) {%>
               <li><a href="/profile">Profile</a></li>
+							<li><a href="/tasks">Tasks</a></li>
               <% if ( user.access >= 3 ) { %><li><a href="/admin">Admin</a></li><% } %>
               <li><a href="/logout">Logout</a></li>
             <% } %>

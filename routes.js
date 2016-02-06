@@ -1,3 +1,4 @@
+var md5 = require ( "md5" );
 module.exports = function ( express,app, db, ejs, datatypes, crypto )
 {
 	// section utility =====================================================================
@@ -8,13 +9,19 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		danger: function ( message ) { return { type: "danger", title: "Oh Snap!", msg: message }; }
 	}
 
+	function gravatar ( email ){
+		var email = md5( email.toString().trim() );
+		return "http://gravatar.com/avatar/" + email + ".png";
+	}
+
 	var testUser = { name: "null", school: "NRSIN15" };
-	function newUser ( username, fullname, password, school, access, teacher, valid )
+	function newUser ( username, fullname, email, password, school, access, teacher, valid )
 	{
 		db.openSync ( "utf8" );
 		var message;
 			var name = fullname || "John Smith",
 					username = username || ( fullname.substring ( 0,1 ) + fullname.substring ( fullname.indexOf( " " ) +1 ) ).toLowerCase(),
+					email = email || username + "@school.edu",
 					password = password || "password123",
 					school = school,
 					access = access || 1,
@@ -43,6 +50,7 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		db.openSync ( "utf8" );
 		if ( stuff.username == undefined ) { return alert.danger ( "No user specified! Aborting" ); } else { var user = db.getField ( "users", stuff.username ); }
 		if ( stuff.fullname !== undefined ) { user.name = stuff.fullname; }
+		if ( stuff.email  !== undefined ) { user.name = stuff.email; }
 		if ( stuff.password !== undefined ) { user.password = stuff.password; }
 		if ( stuff.valid == "true" || stuff.valid == true ) { user.valid = true; } else { user.valid = false; }
 		if ( stuff.school !== undefined && db.checkFieldExists ( "schools", stuff.school ) ) { user.school = stuff.school; } else { alert.danger ( "School not found." ); }
@@ -145,6 +153,7 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		var status = req.session.status || undefined; req.session.status = undefined;
 		db.openSync( "utf8" );
 		var user = db.getField( "users", req.session.user_id );
+		user.avatar = gravatar(user.email);
 		var school = db.getField( "schools", user.school );
 		var teacher = db.getField( "users", user.teacher );
 		res.render ( 'profile', {
@@ -167,7 +176,7 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		var tasks = [];
 		var temp = db.getTable( "tasks" )
 		for ( key in temp ){
-			if ( temp[key].teacher == user.teacher ) temp.push ( temp[key] )
+			if ( temp[key].teacher == user.teacher ) tasks[key] = temp[key]
 		}
 		res.render( 'tasklist/student', {
 			user_id: req.session.user_id,
@@ -199,8 +208,8 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 			});
 		} else {
 			req.session.status = alert.danger ( "Task " + req.params.task_id + " not found, please try again" );
-			res.writeHead ( "404" );
 			res.redirect ( '/' );
+			res.writeHead ( "404" );
 		}
 	});
 
@@ -219,6 +228,8 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		{
 			var user = db.getField ( "users", req.session.user_id );
 			var targetUser = db.getField ( "users", req.params.user_id );
+			targetUser.avatar = gravatar( targetUser.email );
+			var email = targetUser.email || "";
 			var school = db.getField ( "schools", targetUser.school );
 			var teacher = db.getField ( "users", targetUser.teacher );
 			res.render ( 'profile', {
@@ -243,6 +254,9 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		var user = db.getField ( "users", req.session.user_id );
 		var schools = db.getTable ( "schools" );
 		var users = db.getTable ( "users" );
+		for ( key in users ) {
+			users[key].avatar = gravatar ( users[key].email );
+		};
 		if ( user.access >= 3 )
 		{
 			res.render ( 'admin', {
@@ -327,7 +341,7 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		var post = req.body;
 		if ( post.inputPassword == post.inputPassword2 )
 		{
-			req.session.status = newUser ( post.inputUsername, post.inputFullName, post.inputPassword, post.inputSchool, false ) || alert.success("");
+			req.session.status = newUser ( post.inputUsername, post.inputFullName, post.inputEmail, post.inputPassword, post.inputSchool, false ) || alert.success("");
 			if ( req.session.status.type == "success" )
 			{
 				res.redirect ( "/" );
@@ -422,6 +436,7 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 			req.session.status = editUser ({
 				username: post.inputUsername,
 				fullname: post.inputFullName,
+				email: post.inputEmail,
 				password: post.inputPassword,
 				valid: post.inputValid,
 				school: post.inputSchool,
@@ -435,7 +450,7 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 	});
 
 	// section delete user
-	app.get ( '/admin/delete_user/:user_id', auth, function ( req, res ) {
+	app.get ( '/delete_user/:user_id', auth, function ( req, res ) {
 		db.openSync( "utf8" );
 			var user = db.getField ( "users", req.session.user_id ) || { username: null, school: null };
 			var user2 = db.getField ( "users", req.params.user_id ) || { username: null, school: null };
