@@ -11314,7 +11314,7 @@ joint.shapes.logic.Xor = joint.shapes.logic.Gate21.extend({
     }, joint.shapes.logic.Gate21.prototype.defaults),
 
     operation: function(input1, input2) {
-        return (!input1 || input2) && (input1 || !input2);
+        return (!input1 || !input2) && (input1 || input2);
     }
 
 });
@@ -11329,7 +11329,7 @@ joint.shapes.logic.Xnor = joint.shapes.logic.Gate21.extend({
     }, joint.shapes.logic.Gate21.prototype.defaults),
 
     operation: function(input1, input2) {
-        return (!input1 || !input2) && (input1 || input2);
+        return (!input1 || input2) && (input1 || !input2);
     }
 
 });
