@@ -15,35 +15,34 @@
 					<% include partials/error %>
 					<div class="col-sm-12">
 					<% if ( user_id !== undefined ) { %>
-						<div class="panel panel-default">
+						<div class="files panel panel-default">
 							<div class="panel-heading">
 								<a><span class="pull-right glyphicon glyphicon-chevron-up" aria-hidden="true" id="toggle-files"></span></a>
 								<h3 class="panel-title">File Manager</h3>
 							</div>
 							</thead>
-							<div class="panel-body files" style="padding:0px; max-height:190px; overflow: auto">
+							<div class="panel-body" style="padding:0px; max-height:190px; overflow: auto">
 								<table class="table table-hover" style="margin:0;">
 									<thead>
 										<tr>
 											<th>Filename</th>
 											<th>Description</th>
-											<th>Date Modified</th>
 											<th></th>
 										</tr>
 									</thead>
 									<% for ( key in user.files ) {%><tr>
-										<td><%= user.files[key].project.name %></td>
+										<td><% if ( user.files[key].project.author !== user.name ) { %><span class="badge"><%= user.files[key].project.author %></span> <% } %><%= user.files[key].project.name %></td>
 										<td><%= user.files[key].project.desc %></td>
-										<td><%= user.files[key].project.author %></td>
 										<td><button type="button" class="btn btn-danger deleteButton"  mork-data="<%= key %>">Delete</button><button type="button" class="btn btn-danger loadButton" mork-data="<%= key %>">Load</button></td>
 									</tr><% } %>
 								</table>
 							</div>
 						</div>
 					<% } %>
-						<div class="panel panel-default">
+						<div class="sandbox panel panel-default">
 							<div class="panel-heading">
 								<!--<button class="debug btn btn-success">Debug</button>-->
+								<button class="btn btn-info" type="button" onclick="findRoutes()">Show Notation</button>
 								<% if ( user_id !== undefined ) { %>
 									<button class="btn btn-success" type="button" data-toggle="modal" data-target="#saveModal">Save File</button>
 									<button class="btn btn-danger" type="button" id="resetButton">Reset</button>
@@ -81,12 +80,12 @@
 									</div>
 							<div class="form-group">
 								<label for="fileAuthor">Author</label>
-								<input type="text" class="form-control" id="fileAuthor" placeholder="John Doe">
+								<input type="text" class="form-control" id="fileAuthor" value="<%= user.name %>" readonly>
 							</div>
 						</div>
 						<div class="modal-footer">
 							<div class="form-group col-sm-10">
-								<input type="text" class="form-control" id="filename" placeholder="filename.gates">
+								<input type="text" class="form-control" id="filename" placeholder="My Gate">
 							</div>
 							<button type="button" class="col-sm-2 btn btn-primary" id="saveButton">Save</button>
 						</div>
@@ -95,237 +94,40 @@
 			</div>
 		</save>
 
-		<load>
-			<div class="modal fade" id="loadModal" aria-labelledby="saveModalTitle" tabindex="-1" role="dialog">
-				<div class="modal-dialog">
-					<div class="modal-content">
-						<div class="modal-header">
-							<button type="button" class="close" data-dismiss="modal" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-							<h4 class="modal-title" id="saveModalTitle">Load File</h4>
-						</div>
-						<div class="modal-body">
-							<div class="form-group">
-								<label for="fileDesc">Description</label>
-								<textarea class="form-control" id="fileDesc" rows="5" laceholder="Description of file"></textarea>
-							</div>
-							<div class="form-group">
-								<label for="fileAuthor">Author</label>
-								<input type="text" class="form-control" id="fileAuthor" placeholder="John Doe">
-							</div>
-						</div>
-						<div class="modal-footer">
-							<div class="form-group col-sm-10">
-								<input type="text" class="form-control" id="filename" placeholder="filename.gates">
-							</div>
-							<button type="button" class="col-sm-2 btn btn-primary" id="saveButton">Save</button>
-						</div>
-					</div>
-				</div>
-			</div>
-			</load>
-
-			<menu>
-				<nav class="context-menu">
-						<ul class="context-menu__items">
-								<li class="context-menu__item">
-										<a class="context-menu__link" id="context-menu__add" onclick="add()">
-												<i class="glyphicon glyphicon-plus"></i> Add item
-										</a>
+		<menu>
+			<nav class="context-menu">
+					<ul class="context-menu__items">
+							<li class="context-menu__item">
+									<a class="context-menu__link" id="context-menu__duplicate" onclick="dup()">
+											<i class="glyphicon glyphicon-duplicate"></i> Duplicate item
+									</a>
+							</li>
+							<li class="context-menu__item">
+									<a class="context-menu__link" id="context-menu__delete" onclick="del()">
+											<i class="glyphicon glyphicon-trash"></i> Delete item
+									</a>
 								</li>
 								<li class="context-menu__item">
-										<a class="context-menu__link" id="context-menu__duplicate" onclick="dup()">
-												<i class="glyphicon glyphicon-duplicate"></i> Duplicate item
-										</a>
-								</li>
-								<li class="context-menu__item">
-										<a class="context-menu__link" id="context-menu__delete" onclick="del()">
-												<i class="glyphicon glyphicon-trash"></i> Delete item
-										</a>
-								</li>
-						</ul>
-				</nav>
-			</menu>
+									<a class="context-menu__link" id="context-menu__rename" onclick="rename()">
+										<i class="glyphicon glyphicon-pencil"></i> Rename item
+									</a>
+							</li>
+					</ul>
+			</nav>
+		</menu>
 
 		<link rel="stylesheet" type="text/css" href="/css/joint.css" />
 		<script src="/js/lodash.min.js"></script>
 		<script src="/js/backbone-min.js"></script>
 		<script src="/js/joint.js"></script>
-		<script src="/js/logic.js"></script>
-		<link rel="stylesheet" href="/css/logic.css" />
 		<script src="https://cdn.socket.io/socket.io-1.3.7.js"></script>
-		<!--<script src="/js/morkScript.js"></script>-->
-		<script src="/js/context.js"></script>
 		<script>
-			var backupGates = JSON.parse(JSON.stringify(gates)),backupWires = JSON.parse(JSON.stringify(wires)); user = undefined;
-			project = { name: "1s Clock", desc: "Circuit that alternates between on and off once per second.", author: "Jointjs",  }
+			var usr = <% if ( user_id !== undefined ) { %>"<%= print.name %>"<% } else { %><%= "null" %><% } %>;
+			var pwd = <% if ( user_id !== undefined ) { %>"<%= print.password %>"<% } else { %><%= "null" %><% } %>;
 			var socket = io ( "http://themork.co.uk:25567" );
-			var usr = "", pwd = "";
-			var current = current || undefined;
-
-			function addGate ( type )
-			{
-				graph.addCell ( new joint.shapes.logic[type]( { position: { x: 0, y: 0 } } ) );
-			}
-
-			var files = true;
-			$( "#toggle-files" ).click ( function ()
-			{
-				$( ".files" ).slideToggle ( 1000, "swing", function ()
-				{
-					files = !files;
-					if ( files )
-					{
-						$( "#toggle-files" ).removeClass ("glyphicon-chevron-up").addClass ("glyphicon-chevron-down");
-					} else {
-						$( "#toggle-files" ).removeClass ("glyphicon-chevron-down").addClass ("glyphicon-chevron-up");
-					}
-				});
-			});
-
-			socket.on ( "connected", function()
-			{
-				usr = <% if ( user_id !== undefined ) { %>"<%= print.name %>"<% } else { %><%= "null" %><% } %>;
-				pwd = <% if ( user_id !== undefined ) { %>"<%= print.password %>"<% } else { %><%= "null" %><% } %>;
-				//alert ( "Hello, <%= user.name %>, your username is " + usr + ", and your password is " + pwd );
-				if ( usr !== null && pwd !== null )
-				{	socket.emit ( "login", { usr: usr, pwd: pwd } ) }
-			});
-			socket.on ( 'broadcast', function ( data )
-			{
-				console.log ( data );
-			});
-			socket.on ( 'login_response', function ( data )
-			{
-				user = data;
-				files = data.files;
-				showAlert ( "success", "Successfully logged in! :-)" )
-			});
-
-			function refresh ()
-			{
-				graph.addCells ( _.toArray ( gates ) );
-				_.each ( wires, function ( attributes )
-				{
-					graph.addCell ( paper.getDefaultLink().set ( attributes ) );
-				});
-			}
-
-			function saveToServer ( filename, desc, author )
-			{
-				if ( user !== undefined && user.username.toString().trim() !== "" ) {
-					var saveData = {
-						project: { name: filename, desc: desc, author: author },
-						graph: graph.toJSON()
-					};
-					socket.emit ( "save_data", { user: user, saveData: saveData } );
-					return true;
-					};
-				return false;
-			}
-
-			socket.on ( 'save_response', function ( data )
-			{
-				if ( data == true ){
-					$('#saveModal').modal('hide');
-					showAlert("success", "Diagram saved to account! :-)");
-				} else {
-					$('#saveModal').modal('hide');
-					showAlert("danger", "Error: " + data);
-				}
-			});
-
-			function loadFromServer ( filename )
-			{
-				if ( user !== undefined && user.username.toString().trim() !== "" )
-				{
-					socket.emit( 'load_data', { user: { username: usr, password: pwd } , target: filename } );
-				}
-			}
-
-			function deleteFromServer ( filename )
-			{
-				if ( user !== undefined && user.username.toString().trim() !== "" )
-				{
-					socket.emit( 'delete_data', { user: { username: usr, password: pwd } , target: filename } );
-				}
-			}
-
-			socket.on ( 'load_data', function ( data )
-			{
-				console.log("data received");
-				project = data.project;
-				graph.fromJSON( data.graph );
-				current = initializeSignal();
-			});
-
-			$("#resetButton").click ( function ( )
-			{
-				graph.resetCells();
-				gates = backupGates; wires = backupWires;
-				refresh();
-			});
-
-			paper.on('cell:pointerdown', function( cellView, event )
-			{
-				switch ( event.button )
-				{
-					case 0:
-					break;
-
-					case 1:
-						var type = cellView.model.attributes.type.split ( "." ) || [ "none", "none" ];
-						var pos = cellView.model.attributes.position || { x:0, y:0 };
-						var id = Date.now();
-						//console.log  ( type );
-						if ( type [0].toLowerCase() == "logic" && type [1] !== "Wire" )
-						{
-							gates [ id ] = new joint.shapes.logic [ type[1] ] ( { position: pos } );
-							graph.addCell ( gates [ id ] );
-						}
-					break;
-
-					case 2:
-						// contextmenu( cellView );
-						// cellView.model.remove();
-					break;
-				}
-			});
-			paper.on ( 'cell:pointerdblclick', function ( cellView )
-			{
-				var type = cellView.model.attributes.type;
-				if ( type.indexOf ( "put" ) !== -1 )
-				{
-					var text = prompt ( "Enter name to assign to the node", cellView.model.attr("text").text );
-					cellView.model.attr("text",{text:text});
-				}
-			});
-
-			$('#paper').mousedown(function(e){if(e.button==1)return false});
-			$('#paper').bind('contextmenu',function(e){return false;});
-
-			$( "#saveButton" ).click ( function()
-			{
-				saveToServer ( $( "#filename" ).val(), $( "#fileDesc " ).val(), $( "#fileAuthor" ).val() );
-			});
-			$( ".loadButton" ).click( function()
-			{
-				var file = $( this ).attr( "mork-data" );
-				loadFromServer ( file );
-			});
-
-			$( ".deleteButton" ).click( function()
-			{
-				var file = $( this ).attr( "mork-data" );
-				deleteFromServer ( file );
-			});
-
-			var alert = '<div class="alert alert-$type fade in out" id="$id" role="alert">$msg</div>';
-			function showAlert ( type, msg )
-			{
-				var id = Date.now();
-				$("#messageArea").append( alert.replace("$type",type).replace("$id",id).replace("$msg",msg) );
-				setTimeout( function(){$("#" + id).alert('close')}, 2000);
-			}
 		</script>
+		<script src="/js/logic.js"></script>
+		<script src="/js/context.js"></script>
+		<link rel="stylesheet" href="/css/logic.css" />
 	</body>
 </html>
