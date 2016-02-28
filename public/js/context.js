@@ -42,6 +42,23 @@ function del()
 	toggleMenuOff();
 }
 
+function rename()
+{
+	if ( cellView !== undefined )
+	{
+		if ( cellView.attributes.type !== "logic.wire" )
+		{
+			var type = cellView.model.attributes.type;
+			if ( type.indexOf ( "put" ) !== -1 )
+			{
+				var text = ( prompt ( "Enter name to assign to the node", cellView.model.attr("text").text ) || cellView.model.attr("text").text ).toLowerCase();
+				cellView.model.attr("text",{text:text});
+				toggleMenuOff();
+			}
+		}
+	}
+}
+
 var menu = document.querySelector(".context-menu");
 var menuState = 0;
 var active = "context-menu--active";
@@ -56,10 +73,6 @@ function toggleMenuOn ( c, t ) {
 		menu.classList.add(active);
 		switch (t)
 		{
-			case "paper":
-				$("#context-menu__add").addClass("active");
-			break;
-
 			case "logic.Wire":
 				$("#context-menu__delete").addClass("active");
 			break;
@@ -67,6 +80,7 @@ function toggleMenuOn ( c, t ) {
 			default:
 				$("#context-menu__duplicate").addClass("active");
 				$("#context-menu__delete").addClass("active");
+				( t.indexOf("put") !== -1 ) ? $("#context-menu__rename").addClass("active") : true;
 		}
 	} else { toggleMenuOff(); toggleMenuOn ( c, t ); }
 }
@@ -89,10 +103,6 @@ paper.on('cell:pointerdown', function( cellView, evt, x, y )
 			if ( cellView.model.attributes.type.substring( "logic.Input" ) !== -1 )
 			{
 				var id = cellView.model.id;
-				_.each( graph.getCells(), function ( cell )
-				{
-					if ( true ) {}
-				});
 			}
 			toggleMenuOff();
 		break;
@@ -110,8 +120,9 @@ paper.on('cell:pointerdown', function( cellView, evt, x, y )
 		case 2:
 			var type = cellView.model.attributes.type || "none";
 			toggleMenuOn(cellView, type);
-			menu.style.left = 265 + x*1.5 + "px";
-			menu.style.top = 73 + y*1.5 + "px";
+			menu.style.left = $(".row").position().left + x*1.5 + "px";
+			menu.style.top = $(".row").position().top + ( $("#messageArea").height() + parseInt($("#messageArea").css("margin-bottom") ) || 0 ) + ( $(".files").height() + parseInt($(".files").css("margin-bottom") ) || 0 ) + 60 + y*1.5 + "px";
+			( $( ".files" ).position() !== undefined ) ? menu.style.top += $( ".sandbox" ).position().top : 0
 		break;
 	}
 });
