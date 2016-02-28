@@ -30,14 +30,14 @@
 										<div class="form-group">
                     	<label for="inputUsername" class="col-sm-2 control-label">Username</label>
                     	<div class="col-sm-10">
-                    		<input autocomplete="off" type="text" class="form-control" id="inputUsername" placeholder="Username" value="<%= targetUser.username %>" name="inputUsername">
+                    		<input autocomplete="off" type="text" class="form-control" id="inputUsername" placeholder="Username" value="<%= targetUser.username %>" name="inputUsername" readonly>
                     	</div>
                     </div>
 
 										<div class="form-group">
                     	<label for="inputEmail" class="col-sm-2 control-label">Email Address</label>
                     	<div class="col-sm-10">
-                    		<input type="email" class="form-control" id="inputEmail" placeholder="Username" name="inputEmail" autofill="false">
+                    		<input type="email" class="form-control" id="inputEmail" placeholder="Email Address" name="inputEmail" value="<%= targetUser.email %>">
                     	</div>
                     </div>
 
