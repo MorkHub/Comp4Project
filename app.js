@@ -12,17 +12,7 @@ var session    = require ( "express-session" ),
 	port       = ( process.env.computername == "ANNE" ) ? ( 80 ) : ( 25564 || process.env.port ),
 	args       = process.argv; args.shift(); args.shift();
 
-function errorHandler ( err, req, res, next ){
-	var user = db.getField( "users", req.session.user_id );
-	var status = req.session.status; req.session.status = undefined;
-	res.status(500);
-	res.render ( 'error', {
-		user_id: req.session.user_id,
-		user: user,
-		status: status,
-		error: err
-	});
-}
+function errorHandler(){return true}
 
 // database init
 var db = flat ( "store.db", { persist: true } );
