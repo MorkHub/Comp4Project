@@ -12,7 +12,7 @@ module.exports = function ( app, db, io, host, crypto )
 		socket.on ( 'login', function ( data )
 		{
 			db.openSync ( "utf8" );
-			var usr = crypto.decrypt ( data.usr );
+			var usr = data.usr;
 			var pwd = crypto.decrypt ( data.pwd );
 			if ( db.checkFieldExists ( "users", usr ) )
 			{
@@ -45,7 +45,7 @@ module.exports = function ( app, db, io, host, crypto )
 		{
 			var user = data.user,
 					target = data.target;
-			user.username = crypto.decrypt ( user.username );
+			user.username = user.username;
 			user.password = crypto.decrypt ( user.password );
 			db.openAsync ( "utf8", function()
 			{
@@ -66,7 +66,7 @@ module.exports = function ( app, db, io, host, crypto )
     {
       var user = data.user,
           target = data.target;
-      user.username = crypto.decrypt ( user.username );
+      user.username = user.username;
       user.password = crypto.decrypt ( user.password );
       db.openAsync ( "utf8", function()
       {

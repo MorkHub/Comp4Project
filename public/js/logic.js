@@ -83,7 +83,7 @@ var paper = new joint.dia.Paper({
 	el: divPaper,
 	model: graph,
 	width: divPaper.width(),
-	height: 800,
+	height: divPaper.width(),
 	gridSize: 1,
 	snapLinks: true,
 	linkPinning: false,
@@ -350,22 +350,37 @@ socket.on('login_response', function(data) {
 	showAlert("success", "Successfully logged in! :-)")
 });
 
+var uri;
+function setUri(u){ uri = u; }
+function thumbnail() {
+    temp = "";
+    svgAsDataUri(document.getElementById("paper").children[0], {scale:0.1}, function(uri){ setUri(uri); });
+}
+
 function saveToServer(filename, desc, author) {
 	if (user !== undefined && user.username.toString().trim() !== "") {
-		var saveData = {
-			project: {
-				name: filename,
-				desc: desc,
-				author: author
-			},
-			graph: graph.toJSON()
-		};
-		socket.emit("save_data", {
-			user: user,
-			saveData: saveData
-		});
-		return true;
-	};
+        svgAsDataUri(document.getElementById("paper").children[0], {scale:0.1}, function(uri){
+            findRoutes(false);
+		    var saveData = {
+		        project: {
+		            name: filename,
+		            desc: desc,
+		            author: author,
+		            user_id: usr,
+                    user_name: usr,
+                    thumbnail: uri,
+                    routes: routes
+		    	},
+		    	graph: graph.toJSON()
+		    };
+            console.log(saveData);
+	        socket.emit("save_data", {
+	            user: user,
+	            saveData: saveData
+	        });
+	    	return true;
+	    })
+    };
 	return false;
 }
 
@@ -414,8 +429,16 @@ socket.on('load_data', function(data) {
 
 $("#resetButton").click(function() {
 	graph.resetCells();
+    project = {}; project.author = usr;
+    $("#fileDesc").val(project.desc);
+    $("#fileAuthor").val(project.author);
+    $("#filename").val(project.name);
 	refresh();
 	current = initializeSignal();
+});
+
+$( '#saveModal' ).on( 'shown.bs.modal', function () {
+	$( '#fileAuthor' ).val( project.author || "" );
 });
 
 paper.on('cell:pointerclick', function(c, e, x, y) {
@@ -506,12 +529,15 @@ var routes = [];
 var routeID = 0;
 
 // Trigger recursion for each output node
-function findRoutes(){
+function findRoutes(output){
+  output = output == undefined ? true : output;
   routes = [];
   routeID = 0;
   getOutputs();
   _.each( _.toArray(outputs), function ( output ) {
     try { search(output); routeID++; } catch (e) { if ( e.name == "RangeError" ) { showAlert( "danger", "Trace timed out. Is there a loop?" ); routes.splice(routeID,1); } }
   });
-  ( routes.length > 0 ) && showAlert ( "success", "Routes found:<br>" + routes.join("<br>") ) && console.log( routes.join("\n") )
+  if (output) { ( routes.length > 0 ) && showAlert ( "success", "Routes found:<br>" + routes.join("<br>") ) }
+	if (output ) { try{prompt( "",routes.join("\n") )}catch(e){showAlert("warn",e)} }
 }
+
