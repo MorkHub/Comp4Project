@@ -1,20 +1,43 @@
 <nav class="navbar navbar-default" role="navigation">
-    <div class="container-fluid">
-        <div class="navbar-header">
-            <a class="navbar-brand" href="#">
-                <span class="glyphicon glyphicon glyphicon-tree-deciduous"></span>
-                SIN Logic
-            </a>
-        </div>
-        <ul class="nav navbar-nav">
-            <li><a href="/">Home</a></li>
-            <li><a href="/sandbox">Sandbox</a></li>
-            <% if ( user_id !== undefined ) {%>
-              <li><a href="/profile">Profile</a></li>
-							<li><a href="/tasks">Tasks</a></li>
-              <% if ( user.access >= 3 ) { %><li><a href="/admin">Admin</a></li><% } %>
-              <li><a href="/logout">Logout</a></li>
-            <% } %>
-        </ul>
-    </div>
+		<div class="container-fluid">
+				<div class="navbar-header">
+						<a class="navbar-brand">
+								<span class="glyphicon glyphicon glyphicon-tree-deciduous"></span>
+								SIN Logic
+						</a>
+				</div>
+				<ul class="nav navbar-nav navbar-left">
+					<li><a href="/">Home</a></li>
+					<li><a href="/sandbox">Sandbox</a></li>
+					<% if ( user_id !== undefined ) {%>
+						<li><a href="/profile">Profile</a></li>
+						<li><a href="/tasks">Tasks</a></li>
+						<% if ( user.access >= 3 ) { %>
+							<div class="btn-group">
+								<a type="button" href="/admin" class="btn btn-default navbar-btn">Admin</a>
+								<a type="button" class="btn btn-default navbar-btn dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
+									<span class="caret"></span>
+									<span class="sr-only">Toggle Dropdown</span>
+								</a>
+								<ul class="dropdown-menu">
+									<li class="dropdown-header">Administration</li>
+									<% if ( user.access >=5 ) { %><li><a href="/admin/add_user">Add User</a></li><% } %>
+									<% if ( user.access >=7 ) { %><li><a href="/admin/add_school">Add School</a></li><% } %>
+									<li role="separator" class="divider"></li>
+									<li class="dropdown-header">Task Management</li>
+									<li><a href="/admin/add_task">Add Task</a></li>
+									<li><a href="/tasks">View Tasks</a></li>
+								</ul>
+							</div>
+						<% } %>
+					<% } %>
+				</ul>
+				<% if ( user_id !== undefined ) { %>
+				<div class="collapse navbar-collapse" id="bs-example-navbar-collapse-1">
+					<ul class="nav navbar-nav navbar-right">
+						<li><a href="/logout">Logout</a></li>
+					</ul>
+				</div>
+				<% } %>
+		</div>
 </nav>
