@@ -23,21 +23,28 @@
 						<div class="panel-body">
 							<div>Difficulty: <%= levels [ tasks[id].level -1 ] %></div>
 							<div>Summary: <%= tasks[id].summary %></div>
+							<div class="progress" style="margin-top:10px;margin-bottom:0px"><% var submissions = 0; tasks[id].submissions = tasks[id].submissions || {}; for ( key in tasks[id].submissions ) { submissions++ }; var percent = Math.max( 0, Math.min( Math.floor( ( submissions ) / 3 * 100 ) , 100 ) ) %>
+								<div class="progress-bar progress-bar-<%= percent >= 75 ? "success" : ( percent >= 50 ? "warning" : "danger" ) %>" role="progressbar" aria-valuenow="<%= percent %>" aria-valuemin="0" aria-valuemax="100" style="width: <%= percent %>%;">
+									<%= percent %>% ( <%= submissions %> <%= submissions > 1 ? "students" : "student" %> )
+								</div>
+							</div>
 						</div>
 						<div class="panel-footer">
 							<a class="btn btn-primary" href="/task/<%= id %>">Detail</a>
+
 							<div class="btn-group">
 								<button type="button" class="btn btn-success dropdown-toggle" data-toggle="dropdown" aria-haspopup="true" aria-expanded="false">
-									Hand-in <span class="caret"></span>
+									Save Submissions <span class="caret"></span>
 								</button>
 								<ul class="dropdown-menu">
-									<li class="dropdown-header">My files</li>
-									<% for ( id2 in user.files ) { %>
-									<li><a href="/task/<%= id %>/submit/<%= id2 %>"><%= user.files[id2].project.name %></a></li>
+									<li class="dropdown-header">Submissions</li>
+									<% for ( username in tasks[id].submissions ) { %>
+										<li><a href="<%= "/task/"+id+"/import/"+username %>"><%= tasks[id].submissions[username].project.author %></a></li>
 									<% } %>
 								</ul>
 							</div>
 
+							<a class="btn btn-danger" href="/task/<%= id %>/reminder">Email Reminder</a>
 						</div>
 					</div>
 			<% } } %>

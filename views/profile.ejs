@@ -8,7 +8,7 @@
     <header>
         <% include partials/header %>
     </header>
-
+		<% function length (a){b=0;for(c in a){b++};return b;} %>
     <main>
         <div class="row">
           <% if ( user_id == undefined ) { %>
@@ -25,8 +25,7 @@
                     <span class="h1"><%= targetUser.name %></span><% if( targetUser == targetUser) { %><a href="/user/<%= targetUser.username  %>/edit/"><span class="glyphicon glyphicon-pencil"></span></a><% } %>
                     <p>
                       <% if ( teacher.name !== targetUser.name ) { %><strong>Teacher:</strong> <em><a href="/user/<%= teacher.username %>"><%= teacher.name %></a> of</em><% } else { %> Teacher at <% } %> <em><%= school.name %><br></em>
-                      <strong>Challenges Attempted:</strong> <%= targetUser.tasksDone.length %><br>
-                      <strong>Challenges Due:</strong> <%= school.tasks.length %><br>
+                      <strong>Tasks Attempted:</strong> <%= length(targetUser.tasksDone) %><br>
                       <strong>Score:</strong> <%= targetUser.score %><br>
                       <strong>Grade:</strong> <%= targetUser.grade %>
                     </p>

@@ -19,7 +19,7 @@ module.exports = {
 			this.school +
 			this.access
 		);
-		this.tasksDone = [];
+		this.tasksDone = {};
 		this.score = 0;
 		this.grade = "U";
 		this.teacher = teacher || "rsanchez";
@@ -70,13 +70,15 @@ function grade ( score, max )
 }
 function Score ( user )
 {
-	var temp = { score: 0, max: 0  };
-	for ( key in this.tasksDone )
+	user.score = 0;
+	var max = 0;
+	for ( key in user.tasksDone )
 	{
-		var task = this.tasksDone[key];
-		temp.score += task.score; temp.max += task.value;
+		var task = user.tasksDone[key];
+		user.score += task.score; max += task.max;
 	}
-	if ( tasksDone.length <1	) { temp.score = 0; temp.max = 0; }
-	this.grade = grade ( temp.score, temp.max );
-	return temp;
+	if ( length( user.tasksDone ) <1	) { user.score = 0; max = 0; }
+	user.grade = grade ( user.score, max );
 }
+
+function length (a){b=0;for(c in a){b++};return b;}
