@@ -41,7 +41,7 @@ if ( cmd.length > 1 ){
 			} else { console.log( "User exists") }
 		break;
 		case "deluser":
-			( params[0] ) ? ( ( db.checkFieldExists( "users", params[0] ) ) ? ( db.delete( "users", params[0] ) ) : e("User does not exist!") ) : e(usage);
+			( params[0] !== undefined ) ? ( ( db.checkFieldExists( "users", params[0] ) ) ? ( db.delete( "users", params[0] ) ) : e("User does not exist!") ) : e(usage);
 		break;
 		case "showuser":
 			( db.checkFieldExists( "users", params[0] ) ) ? ( console.log( db.getField( "users", params[0] ) ) ) : e(usage);
