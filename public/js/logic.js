@@ -174,6 +174,10 @@ joint.shapes.logic.Output.prototype.onSignal = function(signal) {
 	toggleLive(this, signal);
 }
 
+joint.shapes.logic.Xor.prototype.onSignal = function(signal, handler) {
+    handler.call(this,signal);
+}
+
 // diagramm setup
 var right = Math.floor(paper.svg.clientWidth / 1.5) - 100;
 var count = 0;
@@ -540,4 +544,9 @@ function findRoutes(output){
   if (output) { ( routes.length > 0 ) && showAlert ( "success", "Routes found:<br>" + routes.join("<br>") ) }
 	if (output ) { try{prompt( "",routes.join("\n") )}catch(e){showAlert("warn",e)} }
 }
+$("body > main > div > div.col-md-9 > div > div.panel-heading").append('<div class="badge" id="output">0</div>');
+joint.shapes.logic.Xor.prototype.operation = function(a,b){
+      $("#output").text( (b ? "1" : "0") + (a ? "1" : "0") + " == " + parseInt( (b ? "1" : "0") + (a ? "1" : "0") , 2  )  );
+        return (!a || !b) && (a || b);
 
+}

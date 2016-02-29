@@ -13,7 +13,7 @@
 		<main>
 				<div class="row">
 					<% include partials/error %>
-					<div class="col-sm-12">
+					<div class="col-md-12">
 					<% if ( user_id !== undefined ) { %>
 						<div class="files panel panel-default">
 							<div class="panel-heading">
@@ -39,7 +39,9 @@
 							</div>
 						</div>
 					<% } %>
-						<div class="sandbox panel panel-default">
+				</div>
+				<div class="col-md-9">
+					<div class="sandbox panel panel-default">
 							<div class="panel-heading">
 								<!--<button class="debug btn btn-success">Debug</button>-->
 								<button class="btn btn-info" type="button" onclick="findRoutes()">Show Notation</button>
@@ -56,6 +58,20 @@
 							<div class="panel-body" style="padding:0;">
 								<div id="paper"></div>
 							</div>
+						</div>
+					</div>
+					<div class="col-md-3">
+						<div class="panel panel-default">
+							<div class="panel-heading">
+								<h3 class="panel-title">Panel title</h3>
+							</div>
+							<div class="panel-body">
+								<% var gates = [ "Repeater","Or","And","Not","Nand","Nor","Xor","Xnor","InputOn","InputOff","Output" ]; %>
+									Add Gates:
+								<% gates.forEach ( function( gate ){ %>
+									<br/><a class="" type="button" id="add<%= gate %>" onclick="addGate('<%= gate %>')"><%= gate.toUpperCase() %></a>
+								<% }) %>
+						 	</div>
 						</div>
 					</div>
 				</div>
