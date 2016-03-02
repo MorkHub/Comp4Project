@@ -43,17 +43,11 @@
 				<div class="col-md-9">
 					<div class="sandbox panel panel-default">
 							<div class="panel-heading">
-								<!--<button class="debug btn btn-success">Debug</button>-->
 								<button class="btn btn-info" type="button" onclick="findRoutes()">Show Notation</button>
 								<% if ( user_id !== undefined ) { %>
 									<button class="btn btn-success" type="button" data-toggle="modal" data-target="#saveModal">Save File</button>
-									<button class="btn btn-danger" type="button" id="resetButton">Reset</button>
 								<% } %>
-								<% var gates = [ "Repeater","Or","And","Not","Nand","Nor","Xor","Xnor","InputOn","InputOff","Output" ]; %>
-									Add Gates:
-								<% gates.forEach ( function( gate ){ %>
-									<button class="btn btn-primary" type="button" id="add<%= gate %>" onclick="addGate('<%= gate %>')"><%= gate.toUpperCase() %></button>
-								<% }) %>
+									<button class="btn btn-danger" type="button" id="resetButton">Reset</button>
 							</div>
 							<div class="panel-body" style="padding:0;">
 								<div id="paper"></div>
@@ -63,13 +57,12 @@
 					<div class="col-md-3">
 						<div class="panel panel-default">
 							<div class="panel-heading">
-								<h3 class="panel-title">Panel title</h3>
+								<h3 class="panel-title">Toolbox</h3>
 							</div>
 							<div class="panel-body">
-								<% var gates = [ "Repeater","Or","And","Not","Nand","Nor","Xor","Xnor","InputOn","InputOff","Output" ]; %>
-									Add Gates:
+								<% var gates = [ "Repeater","Or","And","Not","Nand","Nor","Xor","Xnor","Input","Output","Display" ]; %>
 								<% gates.forEach ( function( gate ){ %>
-									<br/><a class="" type="button" id="add<%= gate %>" onclick="addGate('<%= gate %>')"><%= gate.toUpperCase() %></a>
+									<a class="" type="button" id="add<%= gate %>" onclick="addGate('<%= gate %>')"><%= gate.toUpperCase() %></a><br/>
 								<% }) %>
 						 	</div>
 						</div>
