@@ -75,10 +75,11 @@ function Score ( user )
 	for ( key in user.tasksDone )
 	{
 		var task = user.tasksDone[key];
-		user.score += task.score; max += task.max;
+		user.score += parseInt(task.score); max += parseInt(task.max);
 	}
-	if ( length( user.tasksDone ) <1	) { user.score = 0; max = 0; }
+	if ( length( user.tasksDone ) <1 ) { user.score = 0; max = 0; }
 	user.grade = grade ( user.score, max );
+    return user;
 }
 
 function length (a){b=0;for(c in a){b++};return b;}

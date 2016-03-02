@@ -29,10 +29,34 @@
                       <strong>Score:</strong> <%= targetUser.score %><br>
                       <strong>Grade:</strong> <%= targetUser.grade %>
                     </p>
+				</div>
+				<div class="files panel panel-default">
+					<div class="panel-heading">
+						<a><span class="pull-right glyphicon glyphicon-chevron-up" aria-hidden="true" id="toggle-files"></span></a>
+						<h3 class="panel-title">File Manager</h3>
+					</div>
+					</thead>
+					<div class="panel-body" style="padding:0px; max-height:290px; overflow: auto">
+						<table class="table table-hover" style="margin:0;">
+							<thead>
+								<tr>
+									<th>Filename</th>
+									<th>Description</th>
+									<th></th>
+								</tr>
+							</thead>
+							<% for ( key in targetUser.files ) {%><tr>
+									<td><% if ( targetUser.files[key].project.user_id !== targetUser.username ) { %><span class="badge"><%= targetUser.files[key].project.author %></span> <% } %><%= targetUser.files[key].project.name %></td>
+								<td><%= targetUser.files[key].project.desc %></td>
+								<td><button type="button" class="btn btn-danger deleteButton"  mork-data="<%= key %>">Delete</button><button type="button" class="btn btn-danger loadButton" mork-data="<%= key %>">Load</button></td>
+							</tr><% } %>
+						</table>
+					</div>
+				</div>
                   <% } else { %>
                     <span class="h1">User not found.</span>
+					</div>
                   <% } %>
-                </div>
             </div>
               <% if ( user_id == undefined ) { %>
                 <% include partials/login %>

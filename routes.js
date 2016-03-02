@@ -171,7 +171,8 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		db.openSync( "utf8" );
 		var user = db.getField( "users", req.session.user_id );
 		user.avatar = gravatar(user.email);
-		datatypes.userScore(user);
+		user = datatypes.userScore(user);
+        console.log(datatypes.userScore(user))
 		var school = db.getField( "schools", user.school );
 		var teacher = db.getField( "users", user.teacher );
 		res.render ( 'profile', {
@@ -291,12 +292,15 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		db.openSync( "utf8" );
         var post = req.body;
 		var user = db.getField( "users", req.session.user_id );
+        var targetUser = db.getField( "users", req.params.filename );
 		var task = db.getField( "tasks", req.params.task_id );
 		var file = task.submissions[req.params.filename];
 		if ( file !== undefined ) {
             if ( ( user.access >=3 && user.school == task.school ) ||  user.access >= 7 ) {
 	            file.feedback = { "comment": post.inputComment, score: post.inputScore };
+                targetUser.tasksDone[req.params.task_id].comment = post.inputComment;
                 file.feedback.score = post.inputScore;
+                targetUser.tasksDone[req.params.task_id].score = post.inputScore
                 db.saveAsync( "store.db", function(){/* */} );
             }
         } else {
@@ -323,7 +327,7 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 			var user = db.getField ( "users", req.session.user_id );
 			var targetUser = db.getField ( "users", req.params.user_id );
 			targetUser.avatar = gravatar( targetUser.email );
-			datatypes.userScore(targetUser);
+			user = datatypes.userScore(targetUser);
 			var email = targetUser.email || "";
 			var school = db.getField ( "schools", targetUser.school );
 			var teacher = db.getField ( "users", targetUser.teacher );
