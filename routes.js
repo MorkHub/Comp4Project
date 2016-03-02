@@ -294,10 +294,12 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		var task = db.getField( "tasks", req.params.task_id );
 		var file = task.submissions[req.params.filename];
 		if ( file !== undefined ) {
-	        file.feedback = { "comment": post.inputComment, score: post.inputScore };
-            file.feedback.score = post.inputScore;
-            db.saveAsync("store.db",function(){})
-		} else {
+            if ( ( user.access >=3 && user.school == task.school ) ||  user.access >= 7 ) {
+	            file.feedback = { "comment": post.inputComment, score: post.inputScore };
+                file.feedback.score = post.inputScore;
+                db.saveAsync( "store.db", function(){/* */} );
+            }
+        } else {
 			req.session.status = alert.danger ( "Submission not found!" );
             res.redirect( "/task/" + req.params.task_id )
 		}
