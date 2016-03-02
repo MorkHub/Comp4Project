@@ -4,6 +4,42 @@ SVGElement.prototype.getTransformToElement = SVGElement.prototype.getTransformTo
 };
 
 // Extend joint logic
+
+joint.shapes.logic.Display = joint.shapes.logic.IO.extend({
+
+    markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><path class="wire"/><circle class="input1"/><circle class="input2"/><circle class="input3"/><circle class="input4"/><circle class="input5"/><circle class="input6"/><circle class="input7"/><circle class="input8"/><text/></g>',
+
+    defaults: joint.util.deepSupplement({
+
+        type: 'logic.Display',
+        size: {
+            width: 70,
+            height: 60
+        },
+        attrs: {
+            '.wire': { 'ref-x': 0, d: 'M 0 0 L -23 0' },
+            '.input1': { ref: '.body', 'ref-x': -2, 'ref-y': 0.0, magnet: 'passive', 'class': 'input', port: 'in1'  },
+            '.input2': { ref: '.body', 'ref-x': -2, 'ref-y': 0.15, magnet: 'passive', 'class': 'input', port: 'in2'  },
+            '.input3': { ref: '.body', 'ref-x': -2, 'ref-y': 0.30, magnet: 'passive', 'class': 'input', port: 'in3'  },
+            '.input4': { ref: '.body', 'ref-x': -2, 'ref-y': 0.40, magnet: 'passive', 'class': 'input', port: 'in4'  },
+            '.input5': { ref: '.body', 'ref-x': -2, 'ref-y': 0.50, magnet: 'passive', 'class': 'input', port: 'in5'  },
+            '.input6': { ref: '.body', 'ref-x': -2, 'ref-y': 0.65, magnet: 'passive', 'class': 'input', port: 'in6'  },
+            '.input7': { ref: '.body', 'ref-x': -2, 'ref-y': 0.80, magnet: 'passive', 'class': 'input', port: 'in7'  },
+            '.input8': { ref: '.body', 'ref-x': -2, 'ref-y': 0.95, magnet: 'passive', 'class': 'input', port: 'in8'  },
+            text: { text: 'output' }
+
+        }
+
+    }, joint.shapes.logic.IO.prototype.defaults),
+    operation: function(a) {
+        var binary = "";
+        for ( i = 0; i<8; i++ ) {
+            binary += ( arguments[7-i] == true ? "1" : "0" );
+        }
+        this.attr( "text", { text: parseInt( binary, 2 ) });
+    }
+});
+
 joint.shapes.logic.InputOn = joint.shapes.logic.IO.extend({
 	defaults: joint.util.deepSupplement({
 		type: 'logic.InputOn',
@@ -133,7 +169,7 @@ function initializeSignal() {
 
 	var signal = Math.random();
 	// > 0 wire with a positive signal is alive
-	// < 0 wire with a negative signal means, there is no signal 
+	// < 0 wire with a negative signal means, there is no signal
 	// 0 none of the above - reset value
 
 	// cancel all signals stores in wires
@@ -148,12 +184,12 @@ function initializeSignal() {
 		// broadcast a new signal from every input in the graph
 		element.invert = element.invert || false;
 
-		switch (true) {
-			case (element instanceof joint.shapes.logic.InputOn && !element.invert) || (element instanceof joint.shapes.logic.InputOff && element.invert):
-				broadcastSignal(element, signal);
+		switch (element.invert) {
+			case true:
+				element instanceof joint.shapes.logic.Input && broadcastSignal(element, signal);
 				break;
-			case (element instanceof joint.shapes.logic.InputOff && !element.invert) || (element instanceof joint.shapes.logic.InputOn && element.invert):
-				broadcastSignal(element, signal * -1);
+			case false:
+				element instanceof joint.shapes.logic.Input && broadcastSignal(element, signal * -1);
 				break;
 		}
 	});
@@ -448,7 +484,7 @@ $( '#saveModal' ).on( 'shown.bs.modal', function () {
 paper.on('cell:pointerclick', function(c, e, x, y) {
 	var e;
 	_.each(graph.getElements(), function(element) {
-		if (element.id == c.model.id) {
+		if (element.id == c.model.id && element.attributes.type.indexOf("Input") > 0) {
 			element.invert = !element.invert;
 			current = initializeSignal();
 		}
