@@ -31,7 +31,7 @@
 										</tr>
 									</thead>
 									<% for ( key in user.files ) {%><tr>
-										<td><% if ( user.files[key].project.author !== user.name ) { %><span class="badge"><%= user.files[key].project.author %></span> <% } %><%= user.files[key].project.name %></td>
+										<td><% if ( user.files[key].project.user_id !== user.username ) { %><span class="badge"><%= user.files[key].project.author %></span> <% } %><%= user.files[key].project.name %></td>
 										<td><%= user.files[key].project.desc %></td>
 										<td><button type="button" class="btn btn-danger deleteButton"  mork-data="<%= key %>">Delete</button><button type="button" class="btn btn-danger loadButton" mork-data="<%= key %>">Load</button></td>
 									</tr><% } %>
