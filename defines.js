@@ -22,7 +22,7 @@ module.exports = {
 		this.tasksDone = {};
 		this.score = 0;
 		this.grade = "U";
-		this.teacher = teacher || "rsanchez";
+		this.teacher = teacher || "mquantrill";
 	}.bind(this),
 	userScore: Score,
 	Task: function ( name, desc, summary, level, value, teacher, school, solution )
