@@ -30,7 +30,7 @@
 											<th></th>
 										</tr>
 									</thead>
-									<% for ( key in user.files ) {%><tr>
+									<% for ( key in user.files ) {%><tr id="<%= user.files[key].project.name %>">
 										<td><% if ( user.files[key].project.user_id !== user.username ) { %><span class="badge"><%= user.files[key].project.author %></span> <% } %><%= user.files[key].project.name %></td>
 										<td><%= user.files[key].project.desc %></td>
 										<td><button type="button" class="btn btn-danger deleteButton"  mork-data="<%= key %>">Delete</button><button type="button" class="btn btn-danger loadButton" mork-data="<%= key %>">Load</button></td>
@@ -136,6 +136,7 @@
 			var pwd = <% if ( user_id !== undefined ) { %>"<%= print.password %>"<% } else { %><%= "null" %><% } %>;
 			var socket = io ( "http://themork.co.uk:25567" );
 		</script>
+		<script src="/js/gates.js"></script>
 		<script src="/js/logic.js"></script>
 		<script src="/js/context.js"></script>
 		<link rel="stylesheet" href="/css/logic.css" />

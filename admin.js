@@ -76,7 +76,7 @@ if ( cmd.length > 1 ){
 				var task = new def.Task ( name, desc, summary, level, value, teacher, school, solution  );
 				console.log( task );
 				db.createField( "tasks", name.toLowerCase().replace(/ /g,""), task );
-				db.saveAsync( "store.db", function(){} );
+				db.setModified(true);
 			} else { console.log( "Task exists") }	
 		break;
 		case "deltask":

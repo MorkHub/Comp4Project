@@ -45,6 +45,7 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 			{
 				var user = new datatypes.User ( fullname, username, email, password, school, access, teacher, valid );
 				db.createField ( "users", username, user );
+				db.setModified(true);
 				message = alert.success ( "Account created successfully!" );
 			} else {
 				message = alert.danger ( "School code not recognized. Please confirm with your teacher." );
@@ -54,6 +55,31 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		}
 		return message;
 	}
+
+	function newTask ( name, desc, summary, level, value, teacher, school, solution )
+    {
+        db.openSync ( "utf8" );
+        var message;
+            var name = name || "New task",
+			desc = desc || "",
+			summary = summary || "",
+			level = level || 1,
+			value = value || level * 10 || 5,
+			teacher = teacher || db.getTable("users")[0],
+			schoolid = school || db.getField("users",teacher).school,
+			solution = "";
+        if ( db.checkFieldExists ( "schools", schoolid ) )
+        {
+			var school = db.getField("schools",school)
+            var task = new datatypes.Task ( name, desc, summary, level, value, teacher, schoolid, solution );
+			db.createField( "tasks", name.toLowerCase().replace(/ /g,""), task );
+            db.setModified(true);
+            message = alert.success ( "Account created successfully!" );
+        } else {
+            message = alert.danger ( "School not found." );
+        }
+        return message;
+    }
 
 	function editUser ( stuff )
 	{
@@ -73,7 +99,7 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 			if ( stuff.school && db.checkFieldExists ( "schools", stuff.school ) )
 			{
 				message = alert.success ( "User modified successfully"	)
-                db.saveAsync("store.db",function(){});
+				db.saveAsync("store.db",function(){});
 			} else {
 				message = alert.danger ( "School not found. Please check again." );
 			}
@@ -119,7 +145,7 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		if ( db.checkFieldExists ( "users", post.username.trim() ) )	// if user exists
 		{
 			var user = db.getField ( "users", post.username );
-			if	( ( user.password === post.passwd ) && ( user.school === post.school ) )
+			if	( user.password === post.passwd )
 			{
 				return true;
 			}
@@ -172,7 +198,7 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		var user = db.getField( "users", req.session.user_id );
 		user.avatar = gravatar(user.email);
 		user = datatypes.userScore(user);
-        console.log(datatypes.userScore(user))
+		console.log(datatypes.userScore(user))
 		var school = db.getField( "schools", user.school );
 		var teacher = db.getField( "users", user.teacher );
 		res.render ( 'profile', {
@@ -191,6 +217,7 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		var status = req.session.status || undefined; req.session.status = undefined;
 		db.openSync( "utf8" );
 		var user = db.getField ( "users", req.session.user_id );
+		var users = db.getTable("users");
 		var school = db.getField ( "users", req.session.user_id );
 		var tasks = [];
 		var temp = db.getTable( "tasks" )
@@ -201,6 +228,7 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		res.render( 'tasklist/'+page, {
 			user_id: req.session.user_id,
 			user: user,
+			users: users,
 			school: school,
 			tasks: tasks,
 			status: status
@@ -215,16 +243,17 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		var user = db.getField ( "users", req.session.user_id );
 		var school = db.getField ( "schools", user.school );
 		var task = db.getField ( "tasks", req.params.task_id );
-
+		var users = db.getTable("users");
 		if ( task !== undefined )
 		{
 			res.render ( 'tasks',
 			{
 				user_id: req.session.user_id,
 				user: user,
+				users: users,
 				school: school,
 				task: task,
-                task_id: req.params.task_id,
+				task_id: req.params.task_id,
 				status: status
 			});
 		} else {
@@ -234,8 +263,49 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		}
 	});
 
+	// section add task
+    app.get ( '/admin/add_task', auth, function ( req, res )
+    {
+        db.openSync ( "utf8" );
+        status = req.session.status; req.session.status = undefined;
+        var adminUser = db.getField ( "users", req.session.user_id );
+        if ( adminUser.access >= 3 )
+        {
+            var tasks = db.getField ( "schools", adminUser.school ).tasks;
+        } else {
+			req.session.status = alert.danger ( "You do not have permission for this" );
+        }
+        res.render ( "addtask", {
+            user_id: req.session.user_id || "none",
+            user: adminUser,
+			tasks: tasks,
+            users: db.getTable ( "users" ),
+            status: status,
+        });
+    });
+
+	app.post ( '/admin/add_task', auth, function (req,res) {
+		db.openSync ( "utf8" );
+        var post = req.body;
+        var adminUser = db.getField ( "users", req.session.user_id );
+        verifyPost ( req );
+		// name, desc, summary, level, value, teacher, school, solution
+		console.log(adminUser)
+        req.session.status = newTask (
+            post.inputName,
+            post.inputDescription,
+            post.inputSummary,
+            post.inputDifficulty,
+			post.inputDifficulty * 10,
+			adminUser.username,
+			adminUser.school,
+			""
+        );
+        res.redirect ( "/admin/add_user" );	
+	});
+
 	// setion submit task
-    app.get ( '/task/:task_id/submit/:filename', auth, function( req,res )
+	app.get ( '/task/:task_id/submit/:filename', auth, function( req,res )
 	{
 		db.openSync( "utf8" );
 		var user = db.getField( "users", req.session.user_id );
@@ -246,9 +316,10 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 				task.submissions = task.submissions || {};
 				task.submissions[req.session.user_id] = file;
 				( typeof user.tasksDone == "array" ) && ( user.tasksDone = {} )
-				user.tasksDone[ req.params.task_id ] = { id: req.params.task_id, comments: [], max: task.value, score: 0 };
+				user.tasksDone[ req.params.task_id ] = { id: req.params.task_id, comment: "", max: task.value, score: 0 };
 				db.set ( "tasks", req.params.task_id, task );
 				db.set ( "users", req.session.user_id, user );
+				db.setModified(true);
 				req.session.status = alert.success ( "Submission successful!" );
 				res.redirect ( "/tasks" );
 			} else {
@@ -261,7 +332,7 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		}
 	});
 
-    // section import task
+	// section import task
 	app.get ( '/task/:task_id/:filename/import', auth, function( req, res )
 	{
 		db.openSync( "utf8" );
@@ -271,44 +342,49 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		if ( file !== undefined ) {
 			if ( user.files[ req.params.filename ] !== undefined ) {
 				for ( i=0; i<10; i++ ) {
-                    if ( user.files[req.params.file] == undefined ) {
-                        user.files[req.params.file + i] = file;
-                        req.session.status = alert.success ( "Submission from " + req.params.filename + " has been added to your account!" );
-                    }
-                }
+					if ( user.files[req.params.file] == undefined ) {
+						user.files[req.params.file + i] = file;
+						req.session.status = alert.success ( "Submission from " + req.params.filename + " has been added to your account!" );
+					}
+				}
 			} else {
 				user.files[req.params.filename] = file;
+				db.setModified(true);
 				req.session.status = alert.success ( "Submission from " + req.params.filename + " has been added to your account!" );
-            }
+			}
 		} else {
 			req.session.status = alert.danger ( "Submission not found!" );
 		}
 		res.redirect( "/task/" + req.params.task_id );
 	});
 
-    // section feedback submission
-    app.post( '/task/:task_id/:filename/feedback', auth, function( req, res )
-    {
+	// feedback submission
+	app.post( '/task/:task_id/:filename/feedback', auth, function( req, res )
+	{
+		console.log(db.store["db.js"].users[req.params.filename]);
 		db.openSync( "utf8" );
-        var post = req.body;
+		var post = req.body;
 		var user = db.getField( "users", req.session.user_id );
-        var targetUser = db.getField( "users", req.params.filename );
+		var targetUser = db.getField( "users", req.params.filename );
 		var task = db.getField( "tasks", req.params.task_id );
 		var file = task.submissions[req.params.filename];
 		if ( file !== undefined ) {
-            if ( ( user.access >=3 && user.school == task.school ) ||  user.access >= 7 ) {
-	            file.feedback = { "comment": post.inputComment, score: post.inputScore };
-                targetUser.tasksDone[req.params.task_id].comment = post.inputComment;
-                file.feedback.score = post.inputScore;
-                targetUser.tasksDone[req.params.task_id].score = post.inputScore
-                db.saveAsync( "store.db", function(){/* */} );
-            }
-        } else {
+			if ( ( user.access >=3 && user.school == task.school ) ||  user.access >= 7 ) {
+				file.feedback = { "comment": post.inputComment, "score": post.inputScore };
+				file.feedback.score = post.inputScore;
+				targetUser.tasksDone[req.params.task_id] = targetUser.tasksDone[req.params.task_id] || { id: req.params.task_id, comment: "", max: 20, score: 0 };
+				targetUser.tasksDone[req.params.task_id].comment = post.inputComment;
+				targetUser.tasksDone[req.params.task_id].score = post.inputScore;
+				db.store["db.js"].users[req.params.filename] = targetUser;
+				db.store["db.js"].tasks[req.params.task_id]  = task;
+				db.setModified();
+			}
+		} else {
 			req.session.status = alert.danger ( "Submission not found!" );
-            res.redirect( "/task/" + req.params.task_id )
+			res.redirect( "/task/" + req.params.task_id )
 		}
 		res.redirect( "/task/" + req.params.task_id );
-    });
+	});
 
 	// section view school
 	app.get( '/school/:school_id', function ( req, res )
@@ -417,7 +493,7 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 			var schools = {};
 			schools [ adminUser.school ] = db.getField ( "schools", adminUser.school );
 		}
-		res.render ( "adduser.ejs", {
+		res.render ( "adduser", {
 			user_id: req.session.user_id || "none",
 			user: adminUser,
 			users: db.getTable ( "users" ),
@@ -480,7 +556,7 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 	{
 		db.openSync( "utf8" );
 		var post = req.body;
-        console.log(post)
+		console.log(post)
 		if ( req.session.user_id == req.params.user_id || db.getField("users",req.session.user_id).access >= 3 )
 		{
 			verifyPost ( req );
@@ -496,10 +572,10 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 			});
 			if ( req.session.status.type == "success" )
 			res.redirect ( "/admin" )
-        } else {
-            req.session.status = alert.danger ( "No access." );
-            res.redirect ( "/" );
-        }
+		} else {
+			req.session.status = alert.danger ( "No access." );
+			res.redirect ( "/" );
+		}
 	});
 
 	// section delete user
@@ -550,6 +626,7 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		if ( post.inputCurrentPassword == user.password )
 		{
 			user.password = post.inputNewPassword;
+			db.setModified(true);
 			user.valid = true;
 			console.log ( "User, " + user.username + ", changed their password." );
 			req.session.status = alert.success ( "Password successfully changed!" );
@@ -566,24 +643,30 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		var post = req.body; // Get POST data
 		req.session.user_id = undefined; // Init user_id in session
 		var valid = validUser ( post ); // check if user is valid
-		if ( valid )
-		{
-			db.openSync ( "utf8" );
-			req.session.user_id = post.username;
-			req.session.status = alert.success ( "Successfully authenticated :-)" );
-			var user = db.getField ( "users", post.username )
-			console.log ( "			 + ",	user.name, "has signed in." );
-			if ( user.valid ) // if password not set to be updated
-			{
-				res.redirect ( "/profile" ); // redirect to profile if valid
-			} else {
-				req.session.status = alert.info ( "Your password needs to be updated." );
-				res.redirect ( "/change_password" ); // else redirect to password change page
-			}
-
+		console.log ( post );
+		if ( post.paswd == "" || post.username == "" ) {
+			req.session.status = alert.danger ( "You must enter a username and password." );
+			res.redirect( "/" );
 		} else {
-			req.session.status = alert.danger ( "Couldn't sign you in. Please check credentials." );
-			res.redirect ( "/" ); // redirect to home if invalid
+			if ( valid )
+			{
+				db.openSync ( "utf8" );
+				req.session.user_id = post.username;
+				req.session.status = alert.success ( "Successfully authenticated :-)" );
+				var user = db.getField ( "users", post.username )
+				console.log ( "			 + ",	user.name, "has signed in." );
+				if ( user.valid ) // if password not set to be updated
+				{
+					res.redirect ( "/profile" ); // redirect to profile if valid
+				} else {
+					req.session.status = alert.info ( "Your password needs to be updated." );
+					res.redirect ( "/change_password" ); // else redirect to password change page
+				}
+
+			} else {
+				req.session.status = alert.danger ( "Couldn't sign you in. Please check credentials." );
+				res.redirect ( "/" ); // redirect to home if invalid
+			}
 		}
 	});
 
@@ -602,10 +685,11 @@ module.exports = function ( express,app, db, ejs, datatypes, crypto )
 		res.status(404);
 		status = req.session.status; req.session.status = undefined;
 		db.openSync("utf8");
+		console.log(req.url)
 		res.render( 'error', {
 			user_id: req.session.user_id,
 			user: db.getField( "users", req.session.user_id ),
-			error: "Requested page not found!",
+			error: req.url + " does not exist, click <a href='javascript:window.history.back()'>here</a> to return to the previous page.",
 			status: req.session.status
 		});
 	});

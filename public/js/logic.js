@@ -3,113 +3,7 @@ SVGElement.prototype.getTransformToElement = SVGElement.prototype.getTransformTo
 	return elem.getScreenCTM().inverse().multiply(this.getScreenCTM());
 };
 
-// Extend joint logic
-
-joint.shapes.logic.Display = joint.shapes.logic.IO.extend({
-
-    markup: '<g class="rotatable"><g class="scalable"><rect class="body"/></g><path class="wire"/><circle class="input1"/><circle class="input2"/><circle class="input3"/><circle class="input4"/><circle class="input5"/><circle class="input6"/><circle class="input7"/><circle class="input8"/><text/></g>',
-
-    defaults: joint.util.deepSupplement({
-
-        type: 'logic.Display',
-        size: {
-            width: 70,
-            height: 60
-        },
-        attrs: {
-            '.wire': { 'ref-x': 0, d: 'M 0 0 L -23 0' },
-            '.input1': { ref: '.body', 'ref-x': -2, 'ref-y': 0.0, magnet: 'passive', 'class': 'input', port: 'in1'  },
-            '.input2': { ref: '.body', 'ref-x': -2, 'ref-y': 0.15, magnet: 'passive', 'class': 'input', port: 'in2'  },
-            '.input3': { ref: '.body', 'ref-x': -2, 'ref-y': 0.30, magnet: 'passive', 'class': 'input', port: 'in3'  },
-            '.input4': { ref: '.body', 'ref-x': -2, 'ref-y': 0.40, magnet: 'passive', 'class': 'input', port: 'in4'  },
-            '.input5': { ref: '.body', 'ref-x': -2, 'ref-y': 0.50, magnet: 'passive', 'class': 'input', port: 'in5'  },
-            '.input6': { ref: '.body', 'ref-x': -2, 'ref-y': 0.65, magnet: 'passive', 'class': 'input', port: 'in6'  },
-            '.input7': { ref: '.body', 'ref-x': -2, 'ref-y': 0.80, magnet: 'passive', 'class': 'input', port: 'in7'  },
-            '.input8': { ref: '.body', 'ref-x': -2, 'ref-y': 0.95, magnet: 'passive', 'class': 'input', port: 'in8'  },
-            text: { text: 'output' }
-
-        }
-
-    }, joint.shapes.logic.IO.prototype.defaults),
-    operation: function(a) {
-        var binary = "";
-        for ( i = 0; i<8; i++ ) {
-            binary += ( arguments[7-i] == true ? "1" : "0" );
-        }
-        this.attr( "text", { text: parseInt( binary, 2 ) });
-    }
-});
-
-joint.shapes.logic.InputOn = joint.shapes.logic.IO.extend({
-	defaults: joint.util.deepSupplement({
-		type: 'logic.InputOn',
-		size: {
-			width: 30,
-			height: 30
-		},
-		attrs: {
-			'.body': {
-				fill: '#FEB662',
-				stroke: '#CF9452',
-				'stroke-width': 2
-			},
-			'.wire': {
-				'ref-dx': 0,
-				d: 'M 0 0 L 23 0'
-			},
-			circle: {
-				ref: '.body',
-				'ref-dx': 30,
-				'ref-y': 0.5,
-				magnet: true,
-				'class': 'output',
-				port: 'out'
-			},
-			text: {
-				text: '1'
-			}
-		}
-	}, joint.shapes.logic.IO.prototype.defaults),
-	operation: function() {
-		return true;
-	}
-});
-
-joint.shapes.logic.InputOff = joint.shapes.logic.IO.extend({
-	defaults: joint.util.deepSupplement({
-		type: 'logic.InputOff',
-		size: {
-			width: 30,
-			height: 30
-		},
-		attrs: {
-			'.body': {
-				fill: '#68DDD5',
-				stroke: '#44CCC3',
-				'stroke-width': 2
-			},
-			'.wire': {
-				'ref-dx': 0,
-				d: 'M 0 0 L 23 0'
-			},
-			circle: {
-				ref: '.body',
-				'ref-dx': 30,
-				'ref-y': 0.5,
-				magnet: true,
-				'class': 'output',
-				port: 'out'
-			},
-			text: {
-				text: '0'
-			}
-		}
-	}, joint.shapes.logic.IO.prototype.defaults),
-	operation: function() {
-		return false;
-	}
-});
-
+var user;
 // calculate the output signal
 var divPaper = $('#paper');
 var graph = new joint.dia.Graph();
@@ -271,18 +165,6 @@ var gates = gates || {
 			y: stack()
 		}
 	}),
-	on: new joint.shapes.logic.InputOn({
-		position: {
-			x: right,
-			y: stack()
-		}
-	}),
-	off: new joint.shapes.logic.InputOff({
-		position: {
-			x: right,
-			y: stack()
-		}
-	}),
 	output: new joint.shapes.logic.Output({
 		position: {
 			x: right,
@@ -351,10 +233,14 @@ var current = initializeSignal();
 var current = current || undefined;
 
 function addGate(type) {
-	graph.addCell(new joint.shapes.logic[type]({
-		position: { x: 0,	y: 0 }
-	}));
-	current = initializeSignal();
+	try {
+		graph.addCell(new joint.shapes.logic[type]({
+			position: { x: 0,	y: 0 }
+		}));
+		current = initializeSignal();
+	} catch (e) {
+		showAlert("danger","Gate could not be added");
+	}
 }
 
 var files = true;
@@ -390,11 +276,12 @@ socket.on('login_response', function(data) {
 	showAlert("success", "Successfully logged in! :-)")
 });
 
+
 var uri;
 function setUri(u){ uri = u; }
 function thumbnail() {
     temp = "";
-    svgAsDataUri(document.getElementById("paper").children[0], {scale:0.1}, function(uri){ setUri(uri); });
+    svgAsPngUri(document.getElementById("paper").children[0], {scale:0.1}, function(uri){ setUri(uri); });
 }
 
 function saveToServer(filename, desc, author) {
@@ -420,7 +307,9 @@ function saveToServer(filename, desc, author) {
 	        });
 	    	return true;
 	    })
-    };
+    } else {
+		showAlert("danger","You need to be logged in to do that!");
+	}
 	return false;
 }
 
@@ -428,6 +317,7 @@ socket.on('save_response', function(data) {
 	if (data == true) {
 		$('#saveModal').modal('hide');
 		showAlert("success", "Diagram saved to account! :-)");
+		$(".files table").append("<tr id='"+ data.project.name +"'><td>"+ data.project.name +"</td><td>"+ data.project.desc +"</td></tr>");
 	} else {
 		$('#saveModal').modal('hide');
 		showAlert("danger", "Error: " + data);
@@ -443,6 +333,8 @@ function loadFromServer(filename) {
 			},
 			target: filename
 		});
+	} else {
+		showAlert("danger","You need to be logged in to do that!");
 	}
 }
 
@@ -455,6 +347,9 @@ function deleteFromServer(filename) {
 			},
 			target: filename
 		});
+		$("tr#" + filename).remove();
+	} else {
+		showAlert("danger","You need to be logged in to do that!");
 	}
 }
 
@@ -575,14 +470,8 @@ function findRoutes(output){
   routeID = 0;
   getOutputs();
   _.each( _.toArray(outputs), function ( output ) {
-    try { search(output); routeID++; } catch (e) { if ( e.name == "RangeError" ) { showAlert( "danger", "Trace timed out. Is there a loop?" ); routes.splice(routeID,1); } }
+    try { search(output); routeID++; } catch (e) { if ( e ) { showAlert( "danger", "Trace timed out. Is there a loop?" ); routes.splice(routeID,1); } }
   });
   if (output) { ( routes.length > 0 ) && showAlert ( "success", "Routes found:<br>" + routes.join("<br>") ) }
 	if (output ) { try{prompt( "",routes.join("\n") )}catch(e){showAlert("warn",e)} }
-}
-$("body > main > div > div.col-md-9 > div > div.panel-heading").append('<div class="badge" id="output">0</div>');
-joint.shapes.logic.Xor.prototype.operation = function(a,b){
-      $("#output").text( (b ? "1" : "0") + (a ? "1" : "0") + " == " + parseInt( (b ? "1" : "0") + (a ? "1" : "0") , 2  )  );
-        return (!a || !b) && (a || b);
-
 }

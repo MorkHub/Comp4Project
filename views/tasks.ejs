@@ -44,6 +44,7 @@
 													  <textarea class="form-control" id="inputComment" name="inputComment" placeholder="Enter feedback for student." value="<%= task.submissions[username].feedback %>"><%= task.submissions[username].feedback.comment %></textarea>
 												  </div>
 												  <button type="submit" class="btn btn-default">Submit</button>
+												  <a class="btn btn-success" href="<% task.id %>/<%= username %>/import">Import drawing</a>
 											  	</form>
 												<% } %>
 											</div>
@@ -55,8 +56,8 @@
 							</div>
 						</div>
 						<div class="panel-footer">
-
-							<div class="progress" style="margin-top:10px;margin-bottom:0px"><% var submissions = 0; task.submissions = task.submissions || {}; for ( key in task.submissions ) { submissions++ }; var percent = Math.max( 0, Math.min( ( submissions ) / 2 * 100 , 100 ) ) %>
+							<% var count = 0; for (username in users) { if (user.school = task.school && user.access < 3) count++ } %>
+							<div class="progress" style="margin-top:10px;margin-bottom:0px"><% var submissions = 0; task.submissions = task.submissions || {}; for ( key in task.submissions ) { submissions++ }; var percent = Math.max( 0, Math.min( ( submissions ) / count * 100 , 100 ) ) %>
 								<div class="progress-bar progress-bar-<%= percent >= 75 ? "success" : ( percent >= 50 ? "warning" : "danger" ) %>" role="progressbar" aria-valuenow="<%= percent %>" aria-valuemin="0" aria-valuemax="100" style="width: <%= percent %>%;">
 									<%= percent %> ( <%= submissions %> <%= submissions > 1 ? "students" : "student" %> )
 								</div>
